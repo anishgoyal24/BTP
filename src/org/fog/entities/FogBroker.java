@@ -138,7 +138,13 @@ public class FogBroker extends PowerDatacenterBroker{
 					
 					break;
 					case ICSA:
-
+                        if(WorkflowEngine.updateFlag==0&&WorkflowEngine.startlastSchedule==0) {
+                            processCloudletUpdateForICSAInit(ev);
+                        }else if(WorkflowEngine.startlastSchedule==0){
+                            processCloudletUpdateForICSAUpdate(ev);
+                        }else {
+                            processCloudletUpdateForICSAGbest(ev);
+                        }
                         break;
 				case MINMIN:
 				case MAXMIN:
@@ -409,6 +415,97 @@ public class FogBroker extends PowerDatacenterBroker{
             if (Parameters.getOverheadParams().getQueueDelay() != null) {
                 delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
             }
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+        }
+        //把Cloudlets交由数据中心处理以后，从CloudletList中移除这些任务，并向CloudletSubmittedList中添加这些任务
+        getCloudletList().removeAll(scheduledList);
+        getCloudletSubmittedList().addAll(scheduledList);
+        cloudletsSubmitted += scheduledList.size();
+    }
+
+    private void processCloudletUpdateForICSAGbest(SimEvent ev) {
+        System.out.println("best");
+        List<Cloudlet> cloudletList=getCloudletList();
+        List<CondorVM> vmList=getVmsCreatedList();
+        List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
+        for(int i=0;i<cloudletList.size();i++) {
+            int cloudletId=cloudletList.get(i).getCloudletId();
+            int vmId=ICSA.bestSchedule[cloudletId];
+            cloudletList.get(i).setVmId(vmId);
+            //setVmState(vmId);
+            scheduledList.add(cloudletList.get(i));
+        }
+        for (Cloudlet cloudlet : scheduledList) {
+            int vmId = cloudlet.getVmId();
+            double delay = 0.0;
+            if (Parameters.getOverheadParams().getQueueDelay() != null) {
+                delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
+            }
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+        }
+        //把Cloudlets交由数据中心处理以后，从CloudletList中移除这些任务，并向CloudletSubmittedList中添加这些任务
+        getCloudletList().removeAll(scheduledList);
+        getCloudletSubmittedList().addAll(scheduledList);
+        cloudletsSubmitted += scheduledList.size();
+    }
+
+    private void processCloudletUpdateForICSAUpdate(SimEvent ev) {
+        System.out.println("update");
+        List<Cloudlet> cloudletList=getCloudletList();
+        List<CondorVM> vmList=getVmsCreatedList();
+        if(WorkflowEngine.updateFlag2==1&&cloudletList.size()!=0) {
+            ICSA.algo();
+        }
+        List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
+        List<Crow> newSchedules=ICSA.schedules;
+        for(int i=0;i<cloudletList.size();i++) {
+            int cloudletId=cloudletList.get(i).getCloudletId();
+            int vmId=newSchedules.get(count2).getPosition()[cloudletId];
+            cloudletList.get(i).setVmId(vmId);
+            //setVmState(vmId);
+            scheduledList.add(cloudletList.get(i));
+        }
+        for (Cloudlet cloudlet : scheduledList) {
+            int vmId = cloudlet.getVmId();
+            double delay = 0.0;
+            if (Parameters.getOverheadParams().getQueueDelay() != null) {
+                delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
+            }
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+        }
+        //把Cloudlets交由数据中心处理以后，从CloudletList中移除这些任务，并向CloudletSubmittedList中添加这些任务
+        getCloudletList().removeAll(scheduledList);
+        getCloudletSubmittedList().addAll(scheduledList);
+        cloudletsSubmitted += scheduledList.size();
+    }
+
+    private void processCloudletUpdateForICSAInit(SimEvent ev) {
+        System.out.println("init");
+        List<Cloudlet> cloudletList = getCloudletList();
+        List<CondorVM> vmList = getVmsCreatedList();
+        if (PsoScheduling.initFlag == 0) {
+            startTime = System.currentTimeMillis();
+            WorkflowEngine engine = (WorkflowEngine) CloudSim.getEntity(workflowEngineId);
+            ICSA.initPopsRandomly(engine.jobList.size(), getVmList().size());
+        }
+        List<Cloudlet> scheduledList = new ArrayList<Cloudlet>();
+        List<Crow> schedules = ICSA.schedules;
+        for (int i = 0; i < cloudletList.size(); i++) {
+            int cloudletId = cloudletList.get(i).getCloudletId();
+            int vmId = schedules.get(count).getPosition()[cloudletId];
+            cloudletList.get(i).setVmId(vmId);
+            //setVmState(vmId);
+            scheduledList.add(cloudletList.get(i));
+        }
+        for (Cloudlet cloudlet : scheduledList) {
+            int vmId = cloudlet.getVmId();
+            double delay = 0.0;
+            if (Parameters.getOverheadParams().getQueueDelay() != null) {
+                delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
+            }
+            // System.out.println("delay:"+delay);
+            // System.out.println("FogBroker.processCloudletUpdateForPSOInit提交给"+getVmsToDatacentersMap().get(vmId)+"号数据中心"+vmId+"号虚拟机的任务："+cloudlet.getCloudletId());
+
             schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
         }
         //把Cloudlets交由数据中心处理以后，从CloudletList中移除这些任务，并向CloudletSubmittedList中添加这些任务

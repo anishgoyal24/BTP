@@ -114,7 +114,7 @@ import jxl.write.biff.RowsExceededException;
 
 @SuppressWarnings("serial")
 public class MainUI extends JFrame {
-	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","GA"};
+	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","ICSA", "GA"};
 	final static String[] objectiveStr = new String[]{"Time","Energy","Cost"};
 	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht"};
 	final static String[] nodeSizeStr = new String[]{};
@@ -172,6 +172,7 @@ public class MainUI extends JFrame {
 	private final JCheckBox chckbxRoundrobin = new JCheckBox("ROUNDROBIN");
 	private final JCheckBox chckbxGa = new JCheckBox("GA");
 	private final JCheckBox chckbxPso = new JCheckBox("PSO");
+	private final JCheckBox chckbxICSA = new JCheckBox("ICSA");
 	static List<JCheckBox> CheckBoxList = new ArrayList<JCheckBox>();
 	private final JRadioButton rdbtnTime = new JRadioButton("Time",true);
 	private final JRadioButton rdbtnEnergy = new JRadioButton("Energy");
@@ -571,6 +572,12 @@ public class MainUI extends JFrame {
 		chckbxGa.setBounds(82, 116, 68, 23);
 		CheckBoxList.add(chckbxGa);
 		panel_2.add(chckbxGa);
+
+		chckbxICSA.setFont(new Font("Consolas", Font.PLAIN, 12));
+		chckbxICSA.setBackground(Color.WHITE);
+		chckbxICSA.setBounds(154, 116, 56, 23);
+		CheckBoxList.add(chckbxICSA);
+		panel_2.add(chckbxICSA);
 		
 		rdbtnTime.setFont(new Font("Consolas", Font.PLAIN, 12));
 		rdbtnTime.setBackground(Color.WHITE);
@@ -1121,6 +1128,8 @@ public class MainUI extends JFrame {
 		 else if(scheduler_method.equals(algrithmStr[4]))
 			 return 5.0;
 		 else if(scheduler_method.equals(algrithmStr[5]))
+			 return 7.0;
+		 else if(scheduler_method.equals(algrithmStr[6]))
 			 return 6.0;
 		 return null;
 	}

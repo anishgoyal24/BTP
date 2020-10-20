@@ -489,6 +489,7 @@ public class WorkflowEngine extends SimEntity {
 				initPopIndex++;
 				init();
 				if(initPopIndex == ICSA.popSize) {
+					System.out.println("here");
 					init();
 					updateFlag = 1;
 					updateFlag2 = 1;
@@ -868,7 +869,6 @@ public class WorkflowEngine extends SimEntity {
      * @post $none
      */
     protected void submitJobs() {
-		System.out.println(getJobsList().size());
         List<Job> list = getJobsList();
         Map<Integer, List> allocationList = new HashMap<>();
         for (int i = 0; i < getSchedulers().size(); i++) {
