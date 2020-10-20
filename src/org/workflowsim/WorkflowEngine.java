@@ -35,6 +35,7 @@ import org.fog.entities.OffloadingEngine;
 import org.fog.utils.FogEvents;
 import org.workflowsim.reclustering.ReclusteringEngine;
 import org.workflowsim.scheduling.GASchedulingAlgorithm;
+import org.workflowsim.scheduling.ICSA;
 import org.workflowsim.scheduling.PsoScheduling;
 import org.workflowsim.utils.Parameters;
 
@@ -74,6 +75,13 @@ public class WorkflowEngine extends SimEntity {
 	public static ArrayList<double[]> indicators =new ArrayList<double[]>();
 	public static ArrayList<Double> updatebest =new ArrayList<Double>();
 	public static List<Long> offloadingTimes = new ArrayList<>();
+
+
+	//ICSA
+	public static double fitnessICSA[] = new double[ICSA.popSize];
+	public static int initPopIndex = 0;
+	public static int indexToUpdate = 0;
+	public static ArrayList<Double> gBestFitness = new ArrayList<>();
 	
     /**
      * The job submitted list.
@@ -208,7 +216,7 @@ public class WorkflowEngine extends SimEntity {
             	switch (Parameters.getSchedulingAlgorithm()) {
 					case ICSA:
 						try{
-							//processJobReturnforICSA();
+							processJobReturnforICSA(ev);
 						}
 						catch (Exception e){
 							e.printStackTrace();
@@ -376,7 +384,7 @@ public class WorkflowEngine extends SimEntity {
     					 gbestIndex = i;
     				}
     			}
-    			PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(gbestIndex);//更新全局最优的调度方案
+    			PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(gbestIndex);//Update the global optimal scheduling plan
     			
     			FogBroker.count2++;
 	        	fitness2[indexForUpdate++] = caculatefitness();
@@ -386,10 +394,10 @@ public class WorkflowEngine extends SimEntity {
 	        	}
  		    }
             if(index1 == PsoScheduling.particleNum && indexForUpdate == PsoScheduling.particleNum) {
- 	        	//处理完了所有的初始化得到的粒子、update后得到的粒子
+ 	        	//Processed all the particles obtained after initialization and particles obtained after update
             	if(PsoScheduling.iterateNum > iterateNum) {
             		for(int i = 0; i < PsoScheduling.particleNum; i++) { 
-            			//更新个体最优
+            			//Update individual optimal
             			if(fitness[i] > fitness2[i]) {
             				int schedule1[] = PsoScheduling.pbest_schedule.get(i);
             				int schedule2[] = PsoScheduling.newSchedules.get(i);
@@ -438,7 +446,7 @@ public class WorkflowEngine extends SimEntity {
             			PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
             		}
             	}
-            	//记录pso结束时间
+            	//Record the end time of the pso
             	endTime = System.currentTimeMillis();
             	algorithmTime = endTime - getScheduler(0).startTime;
             	
@@ -467,6 +475,122 @@ public class WorkflowEngine extends SimEntity {
 		}
 		getJobsReceivedList().add(job);
 		jobsSubmitted--;
+
+		if (getJobsList().isEmpty() && jobsSubmitted == 0){
+			if(initPopIndex != ICSA.popSize) {
+				already = 1;
+				//Processed a particle (the particle obtained by initialization)
+				FogBroker.count++;
+				fitnessICSA[initPopIndex] = caculatefitness();
+				if (fitnessICSA[initPopIndex] < ICSA.schedules.get(initPopIndex).getmFitness()){
+					ICSA.schedules.get(initPopIndex).setMemory(ICSA.schedules.get(initPopIndex).getPosition());
+					ICSA.schedules.get(initPopIndex).setmFitness(fitnessICSA[initPopIndex]);
+				}
+				initPopIndex++;
+				init();
+				if(initPopIndex == ICSA.popSize) {
+					init();
+					updateFlag = 1;
+					updateFlag2 = 1;
+				}
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+
+			else if(indexToUpdate != ICSA.popSize) {
+				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
+				int gbestIndex = -1;
+				for(int i = 0; i < index1; i++) {
+					if(fitnessICSA[i] < ICSA.bestFitness) {
+						ICSA.bestFitness = fitnessICSA[i];
+						gbestIndex = i;
+					}
+				}
+				if (gbestIndex >= 0) ICSA.bestSchedule = ICSA.schedules.get(gbestIndex).getPosition();//Update the global optimal scheduling plan
+
+				FogBroker.count2++;
+				fitnessICSA[indexToUpdate] = caculatefitness();
+				if (fitnessICSA[indexToUpdate] < ICSA.schedules.get(indexToUpdate).getmFitness()){
+					ICSA.schedules.get(indexToUpdate).setMemory(ICSA.schedules.get(indexToUpdate).getPosition());
+					ICSA.schedules.get(indexToUpdate).setmFitness(fitnessICSA[indexToUpdate]);
+				}
+				indexToUpdate++;
+
+				if(FogBroker.count2 != ICSA.popSize && ICSA.iterations > iterateNum) {
+					init();
+					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+				}
+			}
+
+			if(initPopIndex == ICSA.popSize && indexToUpdate == ICSA.popSize) {
+				//Processed all the particles obtained after initialization and particles obtained after update
+				if(ICSA.iterations > iterateNum) {
+//					for(int i = 0; i < ICSA.popSize; i++) {
+//						//Update individual optimal
+//						if(fitness[i] > fitness2[i]) {
+//							int schedule1[] = PsoScheduling.pbest_schedule.get(i);
+//							int schedule2[] = PsoScheduling.newSchedules.get(i);
+//							for(int j = 0; j < schedule1.length; j++)
+//								schedule1[j] = schedule2[j];
+//							PsoScheduling.pbest_fitness[i] = fitness2[i];
+//						}
+//						else
+//							PsoScheduling.pbest_fitness[i]=fitness[i];
+//					}
+//					fitness = PsoScheduling.pbest_fitness;
+//					for(int i = 0; i < PsoScheduling.particleNum; i++) {  //更新全局最优
+//						if(PsoScheduling.pbest_fitness[i] < PsoScheduling.gbest_fitness) {
+//							//index1=i;
+//							PsoScheduling.gbest_fitness = PsoScheduling.pbest_fitness[i];
+//							PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
+//						}
+//					}
+
+					iterateNum++;
+					System.out.println("After "+iterateNum+" iterations:");
+					System.out.println("======gbest_fitness:========"+ICSA.bestFitness);
+					gBestFitness.add(ICSA.bestFitness);
+//	              	printindicators(PsoScheduling.gbest_fitness);
+
+					if(ICSA.iterations != iterateNum) {
+						indexToUpdate = 0;
+						FogBroker.count2 = 0;
+						getController().updateExecutionTime();
+						init();
+						updateFlag2 = 1;
+						//ICSA.newSchedules.removeAll(PsoScheduling.newSchedules);
+						sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+					}
+				}
+			}
+
+			if(startlastSchedule == 1) {
+				double f = caculatefitness();
+				System.out.println("The last result : "+f);
+				for (int i = 0; i < getSchedulerIds().size(); i++) {
+					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
+				}
+			}
+			if(ICSA.iterations == iterateNum && startlastSchedule == 0) {
+				for(int i = 0; i < ICSA.popSize; i++) {
+					if(ICSA.schedules.get(i).getmFitness() == ICSA.bestFitness) {
+						ICSA.bestSchedule = ICSA.schedules.get(i).getMemory();
+					}
+				}
+				//Record the end time of the ICSA
+				endTime = System.currentTimeMillis();
+				algorithmTime = endTime - getScheduler(0).startTime;
+
+				startlastSchedule = 1;
+				caculatefitness();
+				init();
+				//sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+		}
+		else{
+			updateFlag2 = 0;
+			sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+		}
 	}
     
     public double caculatefitness(){

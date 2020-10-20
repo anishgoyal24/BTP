@@ -35,7 +35,7 @@ public class ICSA {
             int j = random.nextInt(popSize);    // Select crow to be followed randomly
             Crow followed = schedules.get(j);
             Crow following = schedules.get(i);
-            double dap = (0.9 * following.fitness() / worstFitness) + 0.1;
+            double dap = (0.9 * following.getFitness() / worstFitness) + 0.1; //TODO
             double r = random.nextDouble();
 
             // Finding new position

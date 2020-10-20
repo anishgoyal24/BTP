@@ -19,14 +19,14 @@ public class PsoScheduling {
 	public static double w;//惯性权重
 	
 	public static int initFlag=0;
-	public static List<int[]> schedules=new ArrayList<int[]>();//更新前
-	public static List<int[]> newSchedules=new ArrayList<int[]>();//更新后
+	public static List<int[]> schedules=new ArrayList<int[]>();//Before Update
+	public static List<int[]> newSchedules=new ArrayList<int[]>();//Updated
 	public static List<int[]> pbest_schedule=new ArrayList<int[]>();
 	public static int[] gbest_schedule;
 	public static double[] pbest_fitness;
 	public static List<double[]> velocity=new ArrayList<double[]>();
 	public static double gbest_fitness=Double.MAX_VALUE;
-	public static int[] x;//更新前
+	public static int[] x;//Before update
 	public static int[] pbestSchedule;
 	public static double[] v;
 	public static int taskNum;
@@ -64,7 +64,7 @@ public class PsoScheduling {
 			int temp1[]=new int[taskNum];
 			int temp2[]=new int[taskNum];
 			double sum[]=new double[taskNum];
-			//更新每种调度方案
+			//Update each scheduling plan
 			pbest=pbest_schedule.get(i);
 			for(int j=0;j<x.length;j++) {
 				temp1[j] = pbest[j]-x[j];

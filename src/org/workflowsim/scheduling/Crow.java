@@ -8,6 +8,7 @@ public class Crow {
     private int dim;
     private int[] memory;
     private double mFitness;
+    private double fitness;
 
 
 
@@ -57,5 +58,13 @@ public class Crow {
 
     public void setmFitness(double mFitness) {
         this.mFitness = mFitness;
+    }
+
+    public double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
     }
 }
