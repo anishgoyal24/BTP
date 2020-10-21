@@ -117,27 +117,27 @@ public class FogBroker extends PowerDatacenterBroker{
             	clearConsumption(ev);
                 break;
             case WorkflowSimTags.CLOUDLET_UPDATE:
-            	switch (Parameters.getSchedulingAlgorithm()) {
-				case PSO:
-					if(WorkflowEngine.updateFlag==0&&WorkflowEngine.startlastSchedule==0) {
-						processCloudletUpdateForPSOInit(ev);
-	            	}else if(WorkflowEngine.startlastSchedule==0){
-	            		processCloudletUpdateForPSOUpdate(ev);
-					}else {
-						processCloudletUpdateForPSOGbest(ev);
-					}
-				  break;
-				case GA:
-					if(WorkflowEngine.gaFlag==0&&WorkflowEngine.findBestSchedule==0) {
-						processCloudletUpdateForGAInit(ev);
-					}else if(WorkflowEngine.gaFlag==1&&WorkflowEngine.findBestSchedule==0){
-						processCloudletUpdateForGA(ev);
-					}
-					if(WorkflowEngine.findBestSchedule==1)
-						processCloudletUpdateForGABest(ev);
-					
-					break;
-					case ICSA:
+                switch (Parameters.getSchedulingAlgorithm()) {
+                    case PSO:
+                        if(WorkflowEngine.updateFlag==0&&WorkflowEngine.startlastSchedule==0) {
+                            processCloudletUpdateForPSOInit(ev);
+                        }else if(WorkflowEngine.startlastSchedule==0){
+                            processCloudletUpdateForPSOUpdate(ev);
+                        }else {
+                            processCloudletUpdateForPSOGbest(ev);
+                        }
+                        break;
+                    case GA:
+                        if(WorkflowEngine.gaFlag==0&&WorkflowEngine.findBestSchedule==0) {
+                            processCloudletUpdateForGAInit(ev);
+                        }else if(WorkflowEngine.gaFlag==1&&WorkflowEngine.findBestSchedule==0){
+                            processCloudletUpdateForGA(ev);
+                        }
+                        if(WorkflowEngine.findBestSchedule==1)
+                            processCloudletUpdateForGABest(ev);
+
+                        break;
+                    case ICSA:
                         if(WorkflowEngine.updateFlag==0&&WorkflowEngine.startlastSchedule==0) {
                             processCloudletUpdateForICSAInit(ev);
                         }else if(WorkflowEngine.startlastSchedule==0){
@@ -424,7 +424,6 @@ public class FogBroker extends PowerDatacenterBroker{
     }
 
     private void processCloudletUpdateForICSAGbest(SimEvent ev) {
-        System.out.println("best");
         List<Cloudlet> cloudletList=getCloudletList();
         List<CondorVM> vmList=getVmsCreatedList();
         List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
@@ -450,7 +449,6 @@ public class FogBroker extends PowerDatacenterBroker{
     }
 
     private void processCloudletUpdateForICSAUpdate(SimEvent ev) {
-        System.out.println("update");
         List<Cloudlet> cloudletList=getCloudletList();
         List<CondorVM> vmList=getVmsCreatedList();
         if(WorkflowEngine.updateFlag2==1&&cloudletList.size()!=0) {
@@ -483,7 +481,7 @@ public class FogBroker extends PowerDatacenterBroker{
         System.out.println("init");
         List<Cloudlet> cloudletList = getCloudletList();
         List<CondorVM> vmList = getVmsCreatedList();
-        if (PsoScheduling.initFlag == 0) {
+        if (ICSA.initFlag == 0) {
             startTime = System.currentTimeMillis();
             WorkflowEngine engine = (WorkflowEngine) CloudSim.getEntity(workflowEngineId);
             ICSA.initPopsRandomly(engine.jobList.size(), getVmList().size());

@@ -25,6 +25,7 @@ public class ICSA {
             Crow schedule = new Crow(taskNum, vmNum);
             schedules.add(schedule);
         }
+        bestSchedule = new int[taskNum];
         initFlag = 1;
     }
 
@@ -57,6 +58,7 @@ public class ICSA {
                 for (int k = 0; k < taskNum; k++){
                     diffVector[k] = 0.01 - step*(following.getPosition()[k] - bestSchedule[k]);
                     newPosition[k] = following.getPosition()[k] + (int)diffVector[k];
+                    if (newPosition[k] >= vmNum || newPosition[k] < 0) newPosition[k] = random.nextInt(vmNum);
                 }
                 following.setPosition(newPosition.clone());
             }

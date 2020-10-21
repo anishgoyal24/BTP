@@ -212,8 +212,8 @@ public class WorkflowEngine extends SimEntity {
             case CloudSimTags.CLOUDLET_SUBMIT:
                 submitJobs();
                 break;
-            case CloudSimTags.CLOUDLET_RETURN:
-            	switch (Parameters.getSchedulingAlgorithm()) {
+			case CloudSimTags.CLOUDLET_RETURN:
+				switch (Parameters.getSchedulingAlgorithm()) {
 					case ICSA:
 						try{
 							processJobReturnforICSA(ev);
@@ -221,22 +221,23 @@ public class WorkflowEngine extends SimEntity {
 						catch (Exception e){
 							e.printStackTrace();
 						}
-				case PSO:
-					try {
-						processJobReturnForPSO(ev);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				case GA:
-					try {
-						processJobReturnForGA(ev);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
+						break;
+					case PSO:
+						try {
+							processJobReturnForPSO(ev);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
+					case GA:
+						try {
+							processJobReturnForGA(ev);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
 
 				case MINMIN:
 				case MAXMIN:
@@ -914,7 +915,7 @@ public class WorkflowEngine extends SimEntity {
         for (int i = 0; i < getSchedulers().size(); i++) {
 
             List submittedList = allocationList.get(getSchedulerId(i));
-            //divid it into sublist
+            //divide it into sublist
 
             int interval = Parameters.getOverheadParams().getWEDInterval();
             double delay = 0.0;
