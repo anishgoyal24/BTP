@@ -9,7 +9,7 @@ public class ICSA {
     public static int vmNum;
     public static ArrayList<Crow> schedules = new ArrayList<>();
     public static int[] bestSchedule;
-    public static double bestFitness;
+    public static double bestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
     public static int popSize = 20;
     public static int iterations = 50;

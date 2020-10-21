@@ -478,7 +478,6 @@ public class FogBroker extends PowerDatacenterBroker{
     }
 
     private void processCloudletUpdateForICSAInit(SimEvent ev) {
-        System.out.println("init");
         List<Cloudlet> cloudletList = getCloudletList();
         List<CondorVM> vmList = getVmsCreatedList();
         if (ICSA.initFlag == 0) {

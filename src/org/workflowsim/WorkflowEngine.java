@@ -490,7 +490,6 @@ public class WorkflowEngine extends SimEntity {
 				initPopIndex++;
 				init();
 				if(initPopIndex == ICSA.popSize) {
-					System.out.println("here");
 					init();
 					updateFlag = 1;
 					updateFlag2 = 1;
