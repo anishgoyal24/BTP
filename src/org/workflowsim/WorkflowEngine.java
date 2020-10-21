@@ -525,26 +525,12 @@ public class WorkflowEngine extends SimEntity {
 			if(initPopIndex == ICSA.popSize && indexToUpdate == ICSA.popSize) {
 				//Processed all the particles obtained after initialization and particles obtained after update
 				if(ICSA.iterations > iterateNum) {
-//					for(int i = 0; i < ICSA.popSize; i++) {
-//						//Update individual optimal
-//						if(fitness[i] > fitness2[i]) {
-//							int schedule1[] = PsoScheduling.pbest_schedule.get(i);
-//							int schedule2[] = PsoScheduling.newSchedules.get(i);
-//							for(int j = 0; j < schedule1.length; j++)
-//								schedule1[j] = schedule2[j];
-//							PsoScheduling.pbest_fitness[i] = fitness2[i];
-//						}
-//						else
-//							PsoScheduling.pbest_fitness[i]=fitness[i];
-//					}
-//					fitness = PsoScheduling.pbest_fitness;
-//					for(int i = 0; i < PsoScheduling.particleNum; i++) {  //更新全局最优
-//						if(PsoScheduling.pbest_fitness[i] < PsoScheduling.gbest_fitness) {
-//							//index1=i;
-//							PsoScheduling.gbest_fitness = PsoScheduling.pbest_fitness[i];
-//							PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
-//						}
-//					}
+					for(int i = 0; i < ICSA.popSize; i++) {  //更新全局最优
+						if(ICSA.schedules.get(i).getmFitness() < ICSA.bestFitness) {
+							ICSA.bestFitness = ICSA.schedules.get(i).getmFitness();
+							ICSA.bestSchedule = ICSA.schedules.get(i).getMemory();
+						}
+					}
 
 					iterateNum++;
 					System.out.println("After "+iterateNum+" iterations:");

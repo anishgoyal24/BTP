@@ -7,8 +7,8 @@ public class Crow {
     private int[] position;
     private int dim;
     private int[] memory;
-    private double mFitness;
-    private double fitness;
+    private double mFitness = Double.MAX_VALUE;
+    private double fitness = Double.MAX_VALUE;
 
 
 
