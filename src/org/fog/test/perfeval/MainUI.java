@@ -826,6 +826,36 @@ public class MainUI extends JFrame {
 			            		System.out.println("Finished drawing");
 		            		}
 		            	}
+						else if(scheduler_method.equals("ICSA")){
+							int repeat = 5;
+							List<Double[]> repeats = new ArrayList<Double[]>();
+							List<Long> times = new ArrayList<Long>();
+							for(int i = 0; i < repeat; i++){
+								System.out.println("---------------------------For the "+(i+1)+" ICSA--------------------------");
+								long time = StartAlgorithm();
+								repeats.add(record.get((record.size()-1)));
+								record.remove(record.size()-1);
+								times.add(time);
+							}
+							Double[] mean = GetMean(repeats);repeats=null;
+							Double[] algomean = new Double[4];
+							algomean[0] = getAlgorithm(scheduler_method);System.out.println(scheduler_method+":");
+							algomean[1] = mean[0];System.out.println("Average task execution time = "+mean[0]);
+							algomean[2] = mean[1];System.out.println("Average energy consumption = "+mean[1]);
+							algomean[3] = mean[2];System.out.println("Average cost = "+mean[2]);
+							record.add(algomean);
+							if(wfEngine.getoffloadingEngine().getOffloadingStrategy() != null)
+								System.out.println("Average offloading Strategy time = " + wfEngine.getAverageOffloadingTime());
+							long averageTime = GetAverageTime(times);times=null;
+							System.out.println("Average "+scheduler_method+" algorithm execution time = " + averageTime);
+							displayTime(averageTime);
+							System.out.println("Drawing "+scheduler_method+" iteration figure......");
+							showDialog("Drawing", "information");
+							Flag = false;
+							drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
+							Flag = true;
+							System.out.println("Finished drawing");
+						}
 		            	else{//其他算法只支持优化时间
 			            	if(!optimize_objective.equalsIgnoreCase("Time"))
 			            		showDialog(scheduler_method+" doesn't support '"+optimize_objective+"' objective , only support 'Time'", "error");

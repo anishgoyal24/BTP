@@ -14,7 +14,7 @@ public class ICSA {
     public static int popSize = 20;
     public static int iterations = 50;
     public static int flightLength = 1;
-    public static double worstFitness = Double.MAX_VALUE; //TODO decide value
+    public static double worstFitness = Double.MIN_VALUE;
     public static double beta = 1.5;
 
     public static void initPopsRandomly(int taskNum1,int vmNum1){
@@ -36,7 +36,7 @@ public class ICSA {
             int j = random.nextInt(popSize);    // Select crow to be followed randomly
             Crow followed = schedules.get(j);
             Crow following = schedules.get(i);
-            double dap = (0.9 * following.getFitness() / worstFitness) + 0.1; //TODO
+            double dap = (0.9 * following.getFitness() / worstFitness) + 0.1;
             double r = random.nextDouble();
 
             // Finding new position
@@ -85,6 +85,8 @@ public class ICSA {
     public static void clear(){
         initFlag = 0;
         schedules.clear();
+        bestFitness = Double.MAX_VALUE;
+        worstFitness = Double.MIN_VALUE;
     }
 
     private static double getStep(double sigma){

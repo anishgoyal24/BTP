@@ -483,6 +483,7 @@ public class WorkflowEngine extends SimEntity {
 				//Processed a particle (the particle obtained by initialization)
 				FogBroker.count++;
 				fitnessICSA[initPopIndex] = caculatefitness();
+				if (ICSA.worstFitness < fitnessICSA[initPopIndex]) ICSA.worstFitness = fitnessICSA[initPopIndex];
 				if (fitnessICSA[initPopIndex] < ICSA.schedules.get(initPopIndex).getmFitness()){
 					ICSA.schedules.get(initPopIndex).setMemory(ICSA.schedules.get(initPopIndex).getPosition());
 					ICSA.schedules.get(initPopIndex).setmFitness(fitnessICSA[initPopIndex]);
@@ -510,6 +511,7 @@ public class WorkflowEngine extends SimEntity {
 
 				FogBroker.count2++;
 				fitnessICSA[indexToUpdate] = caculatefitness();
+				if (ICSA.worstFitness < fitnessICSA[indexToUpdate]) ICSA.worstFitness = fitnessICSA[indexToUpdate];
 				if (fitnessICSA[indexToUpdate] < ICSA.schedules.get(indexToUpdate).getmFitness()){
 					ICSA.schedules.get(indexToUpdate).setMemory(ICSA.schedules.get(indexToUpdate).getPosition());
 					ICSA.schedules.get(indexToUpdate).setmFitness(fitnessICSA[indexToUpdate]);
@@ -533,8 +535,8 @@ public class WorkflowEngine extends SimEntity {
 					}
 
 					iterateNum++;
-					System.out.println("After "+iterateNum+" iterations:");
-					System.out.println("======gbest_fitness:========"+ICSA.bestFitness);
+					//System.out.println("After "+iterateNum+" iterations:");
+					//System.out.println("======gbest_fitness:========"+ICSA.bestFitness);
 					gBestFitness.add(ICSA.bestFitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
@@ -552,7 +554,7 @@ public class WorkflowEngine extends SimEntity {
 
 			if(startlastSchedule == 1) {
 				double f = caculatefitness();
-				System.out.println("The last result : "+f);
+				//System.out.println("The last result : "+f);
 				for (int i = 0; i < getSchedulerIds().size(); i++) {
 					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
 				}
@@ -1143,9 +1145,13 @@ public class WorkflowEngine extends SimEntity {
         gaFlag=0;
         gaFlag2=0;
         findBestSchedule=0;
+
+        initPopIndex = 0;
+        indexToUpdate = 0;
         
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
+        ICSA.clear();
     }
 
 }
