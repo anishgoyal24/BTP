@@ -827,7 +827,7 @@ public class MainUI extends JFrame {
 		            		}
 		            	}
 						else if(scheduler_method.equals("ICSA")){
-							int repeat = 5;
+							int repeat = 30;
 							List<Double[]> repeats = new ArrayList<Double[]>();
 							List<Long> times = new ArrayList<Long>();
 							for(int i = 0; i < repeat; i++){

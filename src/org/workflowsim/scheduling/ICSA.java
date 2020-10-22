@@ -11,8 +11,8 @@ public class ICSA {
     public static int[] bestSchedule;
     public static double bestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
-    public static int popSize = 20;
-    public static int iterations = 50;
+    public static int popSize = 25;
+    public static int iterations = 200;
     public static int flightLength = 1;
     public static double worstFitness = Double.MIN_VALUE;
     public static double beta = 1.5;
@@ -49,8 +49,7 @@ public class ICSA {
                     newPosition[k] = following.getPosition()[k] + (int) diffVector[k];
                     if (newPosition[k] >= vmNum || newPosition[k] < 0) newPosition[k] = random.nextInt(vmNum);
                 }
-                //added by ab
-                following.setPosition(newPosition.clone());
+                following.setPosition(newPosition);
             }
             else{ // Evasion Mode using Levy Flight
                 double sigma = doSigma();
@@ -62,7 +61,7 @@ public class ICSA {
                     newPosition[k] = following.getPosition()[k] + (int)diffVector[k];
                     if (newPosition[k] >= vmNum || newPosition[k] < 0) newPosition[k] = random.nextInt(vmNum);
                 }
-                following.setPosition(newPosition.clone());
+                following.setPosition(newPosition);
             }
 
 //            // Updating Memory
