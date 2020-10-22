@@ -36,7 +36,7 @@ public class ICSA {
             int j = random.nextInt(popSize);    // Select crow to be followed randomly
             Crow followed = schedules.get(j);
             Crow following = schedules.get(i);
-            double dap = (0.9 * following.getFitness() / worstFitness) + 0.1;
+            double dap = (0.9 * followed.getFitness() / worstFitness) + 0.1;
             double r = random.nextDouble();
 
             // Finding new position
@@ -49,6 +49,8 @@ public class ICSA {
                     newPosition[k] = following.getPosition()[k] + (int) diffVector[k];
                     if (newPosition[k] >= vmNum || newPosition[k] < 0) newPosition[k] = random.nextInt(vmNum);
                 }
+                //added by ab
+                following.setPosition(newPosition.clone());
             }
             else{ // Evasion Mode using Levy Flight
                 double sigma = doSigma();
