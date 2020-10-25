@@ -146,6 +146,15 @@ public class FogBroker extends PowerDatacenterBroker{
                             processCloudletUpdateForICSAGbest(ev);
                         }
                         break;
+                    case GOA:
+                        if(WorkflowEngine.updateFlag==0&&WorkflowEngine.startlastSchedule==0) {
+                            processCloudletUpdateForGOAInit(ev);
+                        }else if(WorkflowEngine.startlastSchedule==0){
+                            processCloudletUpdateForGOAUpdate(ev);
+                        }else {
+                            processCloudletUpdateForGOAGbest(ev);
+                        }
+                        break;
 				case MINMIN:
 				case MAXMIN:
 				case FCFS:

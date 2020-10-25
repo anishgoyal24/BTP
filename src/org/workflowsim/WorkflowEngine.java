@@ -225,6 +225,14 @@ public class WorkflowEngine extends SimEntity {
                 break;
 			case CloudSimTags.CLOUDLET_RETURN:
 				switch (Parameters.getSchedulingAlgorithm()) {
+					case GOA:
+						try{
+							processJobReturnForGOA(ev);
+						}
+						catch (Exception e){
+							e.printStackTrace();
+						}
+						break;
 					case ICSA:
 						try{
 							processJobReturnforICSA(ev);
