@@ -30,6 +30,7 @@ public class GOA {
     public static double targetFitness  = Integer.MAX_VALUE;
     public static final double EPSILON = 1E-14;
     public static int maxIter = 200;
+    public static int l = 0; // l is the iteration number
 
     public static double gbest_fitness=Double.MAX_VALUE;
     public static int[] gbest_schedule;
@@ -39,12 +40,13 @@ public class GOA {
 
     public static void init(int jobNum, int maxVmNum){
         // start timer
-        time = System.nanoTime(); // Not sure where to place this
+        //time = System.nanoTime(); // Not sure where to place this
 
         taskNum = jobNum;
         vmNum = maxVmNum;
         
         grassHopperPositions = new int[popSize][taskNum];
+        targetPosition = new int[taskNum];
 
         gbest_schedule=new int[taskNum];
 
@@ -62,15 +64,15 @@ public class GOA {
             schedules.add(grassHopperPositions[i]);
         }
 
-        fitnessHistory = new double[taskNum][maxIter];//initialization of zeros
+        fitnessHistory = new double[popSize][maxIter];//initialization of zeros
         positionHistory = new int[popSize][maxIter][taskNum];//initialization of zeros
         convergenceCurve = new double[maxIter];//initialization of zeros
-        trajectories = new double[taskNum][maxIter];//initialization of zeros
+        trajectories = new double[popSize][maxIter];//initialization of zeros
 
         initFlag = 1;
     }
 
-    public static void updateGrasshoppers(int l) // l is the iteration number
+    public static void updateGrasshoppers() // l is the iteration number
     {
         double c = cMax-(l*((cMax-cMin)/maxIter)); // Eq. (2.8) in the paper
 

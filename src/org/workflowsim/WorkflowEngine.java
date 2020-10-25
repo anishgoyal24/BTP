@@ -88,6 +88,11 @@ public class WorkflowEngine extends SimEntity {
 	public static int initPopIndex = 0;
 	public static int indexToUpdate = 0;
 	public static ArrayList<Double> gBestFitness = new ArrayList<>();
+
+	//GOA
+	public static double fitnessGOA[] = new double[GOA.popSize];
+	public static int initGOAIndex = 0;
+	public static int updateGOAIndex = 0;
 	
     /**
      * The job submitted list.
@@ -366,6 +371,8 @@ public class WorkflowEngine extends SimEntity {
         }
         getJobsReceivedList().add(job);
         jobsSubmitted--;
+
+        GOA.l = iterateNum; // To get current iteration number
         
         if(getJobsList().isEmpty() && jobsSubmitted == 0) {
     		//System.out.println("-------------------------------------------");
@@ -485,11 +492,21 @@ public class WorkflowEngine extends SimEntity {
 
 		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
 			//System.out.println("-------------------------------------------");
-			if(index1 != GOA.popSize) {
+			if(initGOAIndex != GOA.popSize) {
 				already = 1;
 				//Processed a particle (the particle obtained by initialization)
 				FogBroker.count++;
-				fitness[index1++] = caculatefitness();
+				fitnessGOA[initGOAIndex] = caculatefitness();
+				// Add fitness init code
+				GOA.fitnessHistory[initGOAIndex][0] = fitnessGOA[initGOAIndex];
+				//GOA.positionHistory[initGOAIndex][0] = GOA.grassHopperPositions[initGOAIndex];
+				//GOA.trajectories[initGOAIndex][0]= GOA.grassHopperPositions[initGOAIndex][0];
+				if(fitnessGOA[initGOAIndex] < GOA.targetFitness){
+					GOA.targetFitness = fitnessGOA[initGOAIndex];
+					GOA.targetPosition = GOA.grassHopperPositions[initGOAIndex];
+				}
+
+				index1++;
 				init();
 				if(index1 == GOA.popSize) {
 					init();
@@ -498,60 +515,64 @@ public class WorkflowEngine extends SimEntity {
 				}
 				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
 			}
-			else if(indexForUpdate != PsoScheduling.particleNum) {
+			else if(updateGOAIndex != GOA.popSize) {
 				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
 				int gbestIndex = 0;
-				for(int i = 0; i < index1; i++) {
-					if(fitness[i] < PsoScheduling.gbest_fitness) {
-						PsoScheduling.gbest_fitness = fitness[i];
+				for(int i = 0; i < initGOAIndex; i++) {
+					if(fitnessGOA[i] < GOA.gbest_fitness) {
+						GOA.gbest_fitness = fitnessGOA[i];
 						gbestIndex = i;
 					}
 				}
-				PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(gbestIndex);//Update the global optimal scheduling plan
+				GOA.gbest_schedule = GOA.grassHopperPositions[gbestIndex];//Update the global optimal scheduling plan
 
 				FogBroker.count2++;
-				fitness2[indexForUpdate++] = caculatefitness();
+				fitnessGOA[updateGOAIndex] = caculatefitness();
+
+				//Updation Code
+				if(fitnessGOA[updateGOAIndex] < GOA.targetFitness){
+					GOA.targetFitness = fitnessGOA[updateGOAIndex];
+					GOA.targetPosition = GOA.grassHopperPositions[updateGOAIndex];
+				}
+
+				updateGOAIndex++;
+
 				if(FogBroker.count2 != PsoScheduling.particleNum && PsoScheduling.iterateNum > iterateNum) {
 					init();
 					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
 				}
 			}
-			if(index1 == PsoScheduling.particleNum && indexForUpdate == PsoScheduling.particleNum) {
+			if(initGOAIndex == GOA.popSize && updateGOAIndex == GOA.popSize) {
 				//Processed all the particles obtained after initialization and particles obtained after update
-				if(PsoScheduling.iterateNum > iterateNum) {
-					for(int i = 0; i < PsoScheduling.particleNum; i++) {
+				if(GOA.maxIter > iterateNum) {
+					for(int i = 0; i < GOA.popSize; i++) {
 						//Update individual optimal
-						if(fitness[i] > fitness2[i]) {
-							int schedule1[] = PsoScheduling.pbest_schedule.get(i);
-							int schedule2[] = PsoScheduling.newSchedules.get(i);
-							for(int j = 0; j < schedule1.length; j++)
-								schedule1[j] = schedule2[j];
-							PsoScheduling.pbest_fitness[i] = fitness2[i];
+						if(fitnessGOA[i] < GOA.targetFitness){
+							GOA.targetFitness = fitnessGOA[i];
+							GOA.targetPosition = GOA.grassHopperPositions[i];
 						}
-						else
-							PsoScheduling.pbest_fitness[i]=fitness[i];
 					}
-					fitness = PsoScheduling.pbest_fitness;
-					for(int i = 0; i < PsoScheduling.particleNum; i++) {  //更新全局最优
-						if(PsoScheduling.pbest_fitness[i] < PsoScheduling.gbest_fitness) {
+
+					for(int i = 0; i < GOA.popSize; i++) {  //更新全局最优
+						if(fitnessGOA[i] < GOA.gbest_fitness) {
 							//index1=i;
-							PsoScheduling.gbest_fitness = PsoScheduling.pbest_fitness[i];
-							PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
+							GOA.gbest_fitness = fitnessGOA[i];
+							GOA.gbest_schedule = GOA.grassHopperPositions[i];
 						}
 					}
 					iterateNum++;
-					System.out.println("After "+iterateNum+" iterations:");
-					System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
-					updatebest.add(PsoScheduling.gbest_fitness);
+					//System.out.println("After "+iterateNum+" iterations:");
+					//System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
+					//updatebest.add(PsoScheduling.gbest_fitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
-					if(PsoScheduling.iterateNum != iterateNum) {
-						indexForUpdate = 0;
+					if(GOA.popSize != iterateNum) {
+						updateGOAIndex = 0;
 						FogBroker.count2 = 0;
 						getController().updateExecutionTime();
 						init();
 						updateFlag2 = 1;
-						PsoScheduling.newSchedules.removeAll(PsoScheduling.newSchedules);
+						//PsoScheduling.newSchedules.removeAll(PsoScheduling.newSchedules);
 						sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
 					}
 				}
@@ -563,10 +584,10 @@ public class WorkflowEngine extends SimEntity {
 					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
 				}
 			}
-			if(PsoScheduling.iterateNum == iterateNum && startlastSchedule == 0) {
-				for(int i = 0; i < PsoScheduling.particleNum; i++) {
-					if(PsoScheduling.pbest_fitness[i] == PsoScheduling.gbest_fitness) {
-						PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
+			if(GOA.maxIter == iterateNum && startlastSchedule == 0) {
+				for(int i = 0; i < GOA.popSize; i++) {
+					if(fitnessGOA[i] == GOA.gbest_fitness) {
+						GOA.gbest_schedule = GOA.grassHopperPositions[i];
 					}
 				}
 				//Record the end time of the pso
