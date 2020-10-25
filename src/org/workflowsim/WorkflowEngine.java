@@ -35,6 +35,7 @@ import org.fog.entities.OffloadingEngine;
 import org.fog.utils.FogEvents;
 import org.workflowsim.reclustering.ReclusteringEngine;
 import org.workflowsim.scheduling.GASchedulingAlgorithm;
+import org.workflowsim.scheduling.GOA;
 import org.workflowsim.scheduling.ICSA;
 import org.workflowsim.scheduling.PsoScheduling;
 import org.workflowsim.utils.Parameters;
@@ -75,6 +76,11 @@ public class WorkflowEngine extends SimEntity {
 	public static ArrayList<double[]> indicators =new ArrayList<double[]>();
 	public static ArrayList<Double> updatebest =new ArrayList<Double>();
 	public static List<Long> offloadingTimes = new ArrayList<>();
+
+	// For fitness normalized
+	public static double maxTime = 0.0;
+	public static double maxEnergy = 0.0;
+	public static double maxCost = 0.0;
 
 
 	//ICSA
@@ -466,6 +472,122 @@ public class WorkflowEngine extends SimEntity {
 //    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
     }
 
+	protected void processJobReturnForGOA(SimEvent ev) throws Exception {
+		Job job = (Job) ev.getData();
+		if (job.getCloudletStatus() == Cloudlet.FAILED) {
+			// Reclusteringengine will add retry job to jobList
+			System.out.println("failed");
+			int newId = getJobsList().size() + getJobsSubmittedList().size();
+			getJobsList().addAll(ReclusteringEngine.process(job, newId));
+		}
+		getJobsReceivedList().add(job);
+		jobsSubmitted--;
+
+		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
+			//System.out.println("-------------------------------------------");
+			if(index1 != GOA.popSize) {
+				already = 1;
+				//Processed a particle (the particle obtained by initialization)
+				FogBroker.count++;
+				fitness[index1++] = caculatefitness();
+				init();
+				if(index1 == GOA.popSize) {
+					init();
+					updateFlag = 1;
+					updateFlag2 = 1;
+				}
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+			else if(indexForUpdate != PsoScheduling.particleNum) {
+				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
+				int gbestIndex = 0;
+				for(int i = 0; i < index1; i++) {
+					if(fitness[i] < PsoScheduling.gbest_fitness) {
+						PsoScheduling.gbest_fitness = fitness[i];
+						gbestIndex = i;
+					}
+				}
+				PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(gbestIndex);//Update the global optimal scheduling plan
+
+				FogBroker.count2++;
+				fitness2[indexForUpdate++] = caculatefitness();
+				if(FogBroker.count2 != PsoScheduling.particleNum && PsoScheduling.iterateNum > iterateNum) {
+					init();
+					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+				}
+			}
+			if(index1 == PsoScheduling.particleNum && indexForUpdate == PsoScheduling.particleNum) {
+				//Processed all the particles obtained after initialization and particles obtained after update
+				if(PsoScheduling.iterateNum > iterateNum) {
+					for(int i = 0; i < PsoScheduling.particleNum; i++) {
+						//Update individual optimal
+						if(fitness[i] > fitness2[i]) {
+							int schedule1[] = PsoScheduling.pbest_schedule.get(i);
+							int schedule2[] = PsoScheduling.newSchedules.get(i);
+							for(int j = 0; j < schedule1.length; j++)
+								schedule1[j] = schedule2[j];
+							PsoScheduling.pbest_fitness[i] = fitness2[i];
+						}
+						else
+							PsoScheduling.pbest_fitness[i]=fitness[i];
+					}
+					fitness = PsoScheduling.pbest_fitness;
+					for(int i = 0; i < PsoScheduling.particleNum; i++) {  //更新全局最优
+						if(PsoScheduling.pbest_fitness[i] < PsoScheduling.gbest_fitness) {
+							//index1=i;
+							PsoScheduling.gbest_fitness = PsoScheduling.pbest_fitness[i];
+							PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
+						}
+					}
+					iterateNum++;
+					System.out.println("After "+iterateNum+" iterations:");
+					System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
+					updatebest.add(PsoScheduling.gbest_fitness);
+//	              	printindicators(PsoScheduling.gbest_fitness);
+
+					if(PsoScheduling.iterateNum != iterateNum) {
+						indexForUpdate = 0;
+						FogBroker.count2 = 0;
+						getController().updateExecutionTime();
+						init();
+						updateFlag2 = 1;
+						PsoScheduling.newSchedules.removeAll(PsoScheduling.newSchedules);
+						sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+					}
+				}
+			}
+			if(startlastSchedule == 1) {
+				double f = caculatefitness();
+				System.out.println("The last result : "+f);
+				for (int i = 0; i < getSchedulerIds().size(); i++) {
+					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
+				}
+			}
+			if(PsoScheduling.iterateNum == iterateNum && startlastSchedule == 0) {
+				for(int i = 0; i < PsoScheduling.particleNum; i++) {
+					if(PsoScheduling.pbest_fitness[i] == PsoScheduling.gbest_fitness) {
+						PsoScheduling.gbest_schedule = PsoScheduling.pbest_schedule.get(i);
+					}
+				}
+				//Record the end time of the pso
+				endTime = System.currentTimeMillis();
+				algorithmTime = endTime - getScheduler(0).startTime;
+
+				startlastSchedule = 1;
+				caculatefitness();
+				init();
+				//sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+		}
+		else{
+			updateFlag2 = 0;
+			sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+		}
+//      sendNow(getSchedulerId(0), CloudSimTags.END_OF_SIMULATION, null);
+//    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
+	}
+
 	private void processJobReturnforICSA(SimEvent ev) throws Exception{
 		Job job = (Job) ev.getData();
 		if (job.getCloudletStatus() == Cloudlet.FAILED) {
@@ -560,6 +682,8 @@ public class WorkflowEngine extends SimEntity {
 				}
 			}
 			if(ICSA.iterations == iterateNum && startlastSchedule == 0) {
+				
+
 				for(int i = 0; i < ICSA.popSize; i++) {
 					if(ICSA.schedules.get(i).getmFitness() == ICSA.bestFitness) {
 						ICSA.bestSchedule = ICSA.schedules.get(i).getMemory();
@@ -597,13 +721,18 @@ public class WorkflowEngine extends SimEntity {
     		energy = 10*energy*(time/DeadLine);
     		cost = 10*cost*(time/DeadLine);
     	}
+    	maxTime = Double.max(maxTime,time);
+    	maxEnergy = Double.max(maxEnergy,energy);
+    	maxCost = Double.max(maxCost,cost);
+
+    	Double fit = ((time/maxTime) + (energy/maxEnergy) + (cost/maxCost))/((time/maxTime) * (energy/maxEnergy) * (cost/maxCost));
     	
     	double[] a ={time,energy,cost};
     	indicators.add(a);
     	//System.out.println("\t"+time+"\t"+energy+"\t"+cost);
     	switch (Parameters.getOptimization()) {
 		case Time:
-			return time + energy + cost;
+			return fit;
 		case Energy:
 			return energy;
 		case Cost:
@@ -1148,6 +1277,10 @@ public class WorkflowEngine extends SimEntity {
 
         initPopIndex = 0;
         indexToUpdate = 0;
+
+        maxCost = 0.0;
+        maxEnergy = 0.0;
+        maxTime = 0.0;
         
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
