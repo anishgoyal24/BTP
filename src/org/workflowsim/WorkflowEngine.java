@@ -498,6 +498,9 @@ public class WorkflowEngine extends SimEntity {
 		getJobsReceivedList().add(job);
 		jobsSubmitted--;
 
+		GOA.l = iterateNum;
+		System.out.println(iterateNum);
+
 		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
 			//System.out.println("-------------------------------------------");
 			if(initGOAIndex != GOA.popSize) {
@@ -506,7 +509,7 @@ public class WorkflowEngine extends SimEntity {
 				FogBroker.count++;
 				fitnessGOA[initGOAIndex] = caculatefitness();
 				// Add fitness init code
-				GOA.fitnessHistory[initGOAIndex][0] = fitnessGOA[initGOAIndex];
+				//GOA.fitnessHistory[initGOAIndex][0] = fitnessGOA[initGOAIndex];
 				//GOA.positionHistory[initGOAIndex][0] = GOA.grassHopperPositions[initGOAIndex];
 				//GOA.trajectories[initGOAIndex][0]= GOA.grassHopperPositions[initGOAIndex][0];
 				if(fitnessGOA[initGOAIndex] < GOA.targetFitness){
@@ -1315,6 +1318,7 @@ public class WorkflowEngine extends SimEntity {
         maxTime = 0.0;
 
         initGOAIndex = 0;
+        updateGOAIndex = 0;
         
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
