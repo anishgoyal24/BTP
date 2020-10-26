@@ -36,7 +36,7 @@ public class Parameters {
     public enum SchedulingAlgorithm {
 
         MAXMIN, MINMIN, MCT, DATA, PSO,
-        STATIC, FCFS, ROUNDROBIN, INVALID, GA, ICSA, GOA
+        STATIC, FCFS, ROUNDROBIN, INVALID, GA, ICSA, GOA, MS
     }
     
     public enum Optimization{//优化目标
