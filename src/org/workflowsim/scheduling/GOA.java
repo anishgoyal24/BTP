@@ -116,6 +116,7 @@ public class GOA {
                 if(grassHopperPositions[i][j] > ub[j])grassHopperPositions[i][j]=ub[j];
                 if(grassHopperPositions[i][j] < lb[j])grassHopperPositions[i][j]=lb[j];
             }
+            schedules.set(i,grassHopperPositions[i]);
 
         }
     }
