@@ -525,14 +525,14 @@ public class WorkflowEngine extends SimEntity {
 			}
 			else if(updateGOAIndex != GOA.popSize) {
 				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
-				int gbestIndex = 0;
+				int gbestIndex = -1;
 				for(int i = 0; i < initGOAIndex; i++) {
 					if(fitnessGOA[i] < GOA.gbest_fitness) {
 						GOA.gbest_fitness = fitnessGOA[i];
 						gbestIndex = i;
 					}
 				}
-				GOA.gbest_schedule = GOA.grassHopperPositions[gbestIndex];//Update the global optimal scheduling plan
+				if (gbestIndex > -1) GOA.gbest_schedule = GOA.grassHopperPositions[gbestIndex];//Update the global optimal scheduling plan
 
 				FogBroker.count2++;
 				fitnessGOA[updateGOAIndex] = caculatefitness();
