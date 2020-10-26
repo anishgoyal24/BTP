@@ -441,7 +441,7 @@ public class FogBroker extends PowerDatacenterBroker{
             GOA.init(engine.jobList.size(),getVmList().size());
         }
         List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
-        List<int[]> schedules=PsoScheduling.schedules;
+        List<int[]> schedules=GOA.schedules;
         for(int i=0;i<cloudletList.size();i++) {
             int cloudletId=cloudletList.get(i).getCloudletId();
             int vmId=schedules.get(count)[cloudletId];
@@ -473,7 +473,7 @@ public class FogBroker extends PowerDatacenterBroker{
             GOA.updateGrasshoppers(); // CHECK ITERATION NUMBER TO BE PASSED
         }
         List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
-        List<int[]> newSchedules=PsoScheduling.newSchedules;
+        List<int[]> newSchedules=GOA.schedules;
         for(int i=0;i<cloudletList.size();i++) {
             int cloudletId=cloudletList.get(i).getCloudletId();
             int vmId=newSchedules.get(count2)[cloudletId];
