@@ -58,7 +58,7 @@ public class MSAlgorithm {
         for (int i = popSize/2; i < popSize; i++){
             double r = random.nextDouble();
             int[] newSchedule = new int[taskNum];
-            if (r > 0.5){
+            if (r > 0.4){
                 for (int j = 0; j < taskNum; j++){
                     int vm = (int)(((gBestMoth[j] - schedules.get(i).getPosition()[j]) * (accFactor) + schedules.get(i).getPosition()[j]) * lambda);
                     newSchedule[j] = vm >= 0 && vm < vmNum ? vm : random.nextInt(vmNum);
