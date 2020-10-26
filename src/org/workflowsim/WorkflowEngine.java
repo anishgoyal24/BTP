@@ -575,7 +575,7 @@ public class WorkflowEngine extends SimEntity {
 					//updatebest.add(PsoScheduling.gbest_fitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
-					if(GOA.popSize != iterateNum) {
+					if(GOA.maxIter != iterateNum) {
 						updateGOAIndex = 0;
 						FogBroker.count2 = 0;
 						getController().updateExecutionTime();
@@ -587,6 +587,7 @@ public class WorkflowEngine extends SimEntity {
 				}
 			}
 			if(startlastSchedule == 1) {
+				System.out.println("last");
 				double f = caculatefitness();
 				System.out.println("The last result : "+f);
 				for (int i = 0; i < getSchedulerIds().size(); i++) {
@@ -1312,10 +1313,13 @@ public class WorkflowEngine extends SimEntity {
         maxCost = 0.0;
         maxEnergy = 0.0;
         maxTime = 0.0;
+
+        initGOAIndex = 0;
         
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
         ICSA.clear();
+        GOA.clear();
     }
 
 }

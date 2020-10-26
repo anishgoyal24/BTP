@@ -467,6 +467,7 @@ public class FogBroker extends PowerDatacenterBroker{
     }
 
     protected void processCloudletUpdateForGOAUpdate(SimEvent ev) {
+        //System.out.println("update");
         List<Cloudlet> cloudletList=getCloudletList();
         List<CondorVM> vmList=getVmsCreatedList();
         if(WorkflowEngine.updateFlag2==1&&cloudletList.size()!=0) {
