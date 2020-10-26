@@ -750,18 +750,18 @@ public class WorkflowEngine extends SimEntity {
     		energy = 10*energy*(time/DeadLine);
     		cost = 10*cost*(time/DeadLine);
     	}
-    	maxTime = Double.max(maxTime,time);
-    	maxEnergy = Double.max(maxEnergy,energy);
-    	maxCost = Double.max(maxCost,cost);
+//    	maxTime = Double.max(maxTime,time);
+//    	maxEnergy = Double.max(maxEnergy,energy);
+//    	maxCost = Double.max(maxCost,cost);
 
-    	Double fit = ((time/maxTime) + (energy/maxEnergy) + (cost/maxCost))/((time/maxTime) * (energy/maxEnergy) * (cost/maxCost));
+    	//Double fit = ((time/maxTime) + (energy/maxEnergy) + (cost/maxCost))/((time/maxTime) * (energy/maxEnergy) * (cost/maxCost));
     	
     	double[] a ={time,energy,cost};
     	indicators.add(a);
     	//System.out.println("\t"+time+"\t"+energy+"\t"+cost);
     	switch (Parameters.getOptimization()) {
 		case Time:
-			return fit;
+			return time;
 		case Energy:
 			return energy;
 		case Cost:
