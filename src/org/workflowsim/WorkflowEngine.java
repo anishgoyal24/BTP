@@ -514,9 +514,9 @@ public class WorkflowEngine extends SimEntity {
 					GOA.targetPosition = GOA.grassHopperPositions[initGOAIndex];
 				}
 
-				index1++;
+				initGOAIndex++;
 				init();
-				if(index1 == GOA.popSize) {
+				if(initGOAIndex == GOA.popSize) {
 					init();
 					updateFlag = 1;
 					updateFlag2 = 1;
@@ -551,6 +551,7 @@ public class WorkflowEngine extends SimEntity {
 				}
 			}
 			if(initGOAIndex == GOA.popSize && updateGOAIndex == GOA.popSize) {
+				//System.out.println(iterateNum);
 				//Processed all the particles obtained after initialization and particles obtained after update
 				if(GOA.maxIter > iterateNum) {
 					for(int i = 0; i < GOA.popSize; i++) {
@@ -593,6 +594,7 @@ public class WorkflowEngine extends SimEntity {
 				}
 			}
 			if(GOA.maxIter == iterateNum && startlastSchedule == 0) {
+				//System.out.println("here");
 				for(int i = 0; i < GOA.popSize; i++) {
 					if(fitnessGOA[i] == GOA.gbest_fitness) {
 						GOA.gbest_schedule = GOA.grassHopperPositions[i];
