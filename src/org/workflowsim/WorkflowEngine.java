@@ -499,7 +499,7 @@ public class WorkflowEngine extends SimEntity {
 		jobsSubmitted--;
 
 		GOA.l = iterateNum;
-		System.out.println(iterateNum);
+		//System.out.println(iterateNum + " " + initGOAIndex + " " + updateGOAIndex);
 
 		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
 			//System.out.println("-------------------------------------------");
@@ -548,7 +548,7 @@ public class WorkflowEngine extends SimEntity {
 
 				updateGOAIndex++;
 
-				if(FogBroker.count2 != PsoScheduling.particleNum && PsoScheduling.iterateNum > iterateNum) {
+				if(FogBroker.count2 != GOA.popSize && GOA.maxIter > iterateNum) {
 					init();
 					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
 				}
