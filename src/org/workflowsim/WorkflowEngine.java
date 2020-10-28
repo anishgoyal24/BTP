@@ -674,12 +674,12 @@ public class WorkflowEngine extends SimEntity {
 			if(initMSIndex == MSAlgorithm.popSize && updateMSIndex == MSAlgorithm.popSize) {
 				//Processed all the particles obtained after initialization and particles obtained after update
 				if(MSAlgorithm.iterations > iterateNum) {
-					for(int i = 0; i < MSAlgorithm.popSize; i++) {  //更新全局最优
-						if(MSAlgorithm.schedules.get(i).getFitness() < MSAlgorithm.gBestFitness) {
-							MSAlgorithm.gBestFitness = MSAlgorithm.schedules.get(i).getFitness();
-							MSAlgorithm.gBestMoth = MSAlgorithm.schedules.get(i).getPosition();
-						}
-					}
+//					for(int i = 0; i < MSAlgorithm.popSize; i++) {  //更新全局最优
+//						if(MSAlgorithm.schedules.get(i).getFitness() < MSAlgorithm.gBestFitness) {
+//							MSAlgorithm.gBestFitness = MSAlgorithm.schedules.get(i).getFitness();
+//							MSAlgorithm.gBestMoth = MSAlgorithm.schedules.get(i).getPosition();
+//						}
+//					}
 
 					iterateNum++;
 					//System.out.println("After "+iterateNum+" iterations:");
@@ -688,7 +688,7 @@ public class WorkflowEngine extends SimEntity {
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
 					if(MSAlgorithm.iterations != iterateNum) {
-						indexToUpdate = 0;
+						updateMSIndex = 0;
 						FogBroker.count2 = 0;
 						getController().updateExecutionTime();
 						init();
