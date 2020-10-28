@@ -402,8 +402,6 @@ public class WorkflowEngine extends SimEntity {
         }
         getJobsReceivedList().add(job);
         jobsSubmitted--;
-
-        GOA.l = iterateNum; // To get current iteration number
         
         if(getJobsList().isEmpty() && jobsSubmitted == 0) {
     		//System.out.println("-------------------------------------------");
@@ -553,6 +551,7 @@ public class WorkflowEngine extends SimEntity {
 				}
 				if (gbestIndex > -1) GWO.gbest_schedule = GWO.wolfPositions[gbestIndex];//Update the global optimal scheduling plan
 
+
 				FogBroker.count2++;
 				fitnessGWO[updateGWOIndex] = caculatefitness();
 
@@ -581,7 +580,7 @@ public class WorkflowEngine extends SimEntity {
 					iterateNum++;
 					//System.out.println("After "+iterateNum+" iterations:");
 					//System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
-					//updatebest.add(PsoScheduling.gbest_fitness);
+					updatebest.add(GWO.gbest_fitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
 					if(GWO.maxIter != iterateNum) {
@@ -819,7 +818,7 @@ public class WorkflowEngine extends SimEntity {
 					iterateNum++;
 					//System.out.println("After "+iterateNum+" iterations:");
 					//System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
-					//updatebest.add(PsoScheduling.gbest_fitness);
+					updatebest.add(GOA.gbest_fitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
 					if(GOA.maxIter != iterateNum) {

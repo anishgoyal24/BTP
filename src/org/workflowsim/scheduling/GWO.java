@@ -9,7 +9,7 @@ public class GWO {
     public static int vmNum;
 
     public static int initFlag=0;
-    public static int popSize = 20;
+    public static int popSize = 30;
 
     public static int[][] wolfPositions;
     public static double[] wolfFitness;
@@ -28,15 +28,17 @@ public class GWO {
     public static int deltaIndex = 0;
     public static double r1;
     public static double r2;
-
-    public static double cMax=1;
-    public static double cMin=0.00004;
+    public static double thetha1;
+    public static double thetha2;
+    public static double w1;
+    public static double w2;
+    public static double w3;
 
     public static int[] alpha_wolf;
     public static int[] beta_wolf;
     public static int[] delta_wolf;
 
-    public static int maxIter = 200;
+    public static int maxIter = 500;
     public static int current_iteration = 0;
 
     public static double gbest_fitness=Double.MAX_VALUE;
@@ -44,6 +46,7 @@ public class GWO {
     public static List<int[]> schedules=new ArrayList<int[]>();
 
     public static void init(int jobNum, int maxVmNum){
+        //System.out.println("gwo-init-"+current_iteration);
 
         taskNum = jobNum;
         vmNum = maxVmNum;
@@ -78,6 +81,7 @@ public class GWO {
 
     public static void updateWolves(){
         // Update alpha, beta and delta wolf
+        //System.out.println("gwo-upd-"+current_iteration);
 
         alphaIndex=0;
 
@@ -112,7 +116,18 @@ public class GWO {
         //Update a according to the iteration number
 
         for(int j=0;j<taskNum;j++)
-        { a[j]=2.0-((double)current_iteration*(2.0/(double)maxIter));}
+        {
+            //a[j]=2.0-((double)current_iteration*(2.0/(double)maxIter));  GWO
+            a[j] = 2.0*Math.exp((-1*current_iteration)/(maxIter)); //IGWO
+            //a[j] = 2.0*(1-((Math.pow(current_iteration,2))/(Math.pow(maxIter,2)))); //mGWO
+        }
+
+        // Update wi
+        thetha1 = 0.5*Math.atan(current_iteration);
+        thetha2 = (2/Math.PI)*(Math.acos(1/3))*(Math.atan(current_iteration));
+        w1 = Math.cos(thetha2);
+        w2 = 0.5*Math.sin(thetha2)*Math.cos(thetha1);
+        w3 = 1-w1-w2;
 
         //Update position of all wolves
 
@@ -120,8 +135,10 @@ public class GWO {
         {
             for(int j=0;j<taskNum;j++)
             {
-                r1=Math.random();
-                r2=Math.random();
+                //r1=Math.random();
+                //r2=Math.random();
+                r1 = new Random().nextDouble();
+                r2 = new Random().nextDouble();
 
                 for(int ii=0;ii<taskNum;ii++)
                 {A1[ii]=2.0*a[ii]*r1-a[ii];}
@@ -129,10 +146,11 @@ public class GWO {
                 {C1[ii]=2.0*r2;}
 
                 X1[i][j]=alpha_wolf[j]-A1[j]*(Math.abs(C1[j]*alpha_wolf[j]-wolfPositions[i][j]));
-                X1[i][i]=simplebounds(X1[i][j]);
+                X1[i][j]=simplebounds(X1[i][j]);
 
-                r1=Math.random();
-                r2=Math.random();
+                r1 = new Random().nextDouble();
+                r2 = new Random().nextDouble();
+
                 for(int ii=0;ii<taskNum;ii++)
                 {A2[ii]=2.0*a[ii]*r1-a[ii];}
                 for(int ii=0;ii<taskNum;ii++)
@@ -141,8 +159,9 @@ public class GWO {
                 X2[i][j]=beta_wolf[j]-A2[j]*(Math.abs(C2[j]*beta_wolf[j]-wolfPositions[i][j]));
                 X2[i][j]=simplebounds(X2[i][j]);
 
-                r1=Math.random();
-                r2=Math.random();
+                r1 = new Random().nextDouble();
+                r2 = new Random().nextDouble();
+
                 for(int ii=0;ii<taskNum;ii++)
                 {A3[ii]=2.0*a[ii]*r1-a[ii];}
                 for(int ii=0;ii<taskNum;ii++)
@@ -151,10 +170,12 @@ public class GWO {
                 X3[i][j]=delta_wolf[j]-A3[j]*(Math.abs(C3[j]*delta_wolf[j]-wolfPositions[i][j]));
                 X3[i][j]=simplebounds(X3[i][j]);
 
-                wolfPositions[i][j]=(int)((X1[i][j]+X2[i][j]+X3[i][j])/3.0);
+                wolfPositions[i][j]=(int)( w1*X1[i][j] + w2*X2[i][j] + w3*X3[i][j]);
 
-                if(wolfPositions[i][j]<0) wolfPositions[i][j] = 0;
-                if(wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = vmNum-1;
+                //if(wolfPositions[i][j]<0) wolfPositions[i][j] = 0;
+                //if(wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = vmNum-1;
+
+                if(wolfPositions[i][j]<0 || wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = new Random().nextInt(vmNum);
             }
             schedules.set(i,wolfPositions[i]);
         }
@@ -171,7 +192,9 @@ public class GWO {
     public static void clear() {
         gbest_fitness = Double.MAX_VALUE;
         initFlag = 0;
-        schedules.clear();
+        current_iteration = 0;
+        schedules.removeAll(schedules);
+        //schedules.clear();
     }
 
 }

@@ -588,17 +588,17 @@ public class MainUI extends JFrame {
 //		CheckBoxList.add(chckbxGOA);
 //		panel_2.add(chckbxGOA);
 
-		chckbxMS.setFont(new Font("Consolas", Font.PLAIN, 12));
-		chckbxMS.setBackground(Color.WHITE);
-		chckbxMS.setBounds(212, 116, 56, 23);
-		CheckBoxList.add(chckbxMS);
-		panel_2.add(chckbxMS);
+//		chckbxMS.setFont(new Font("Consolas", Font.PLAIN, 12));
+//		chckbxMS.setBackground(Color.WHITE);
+//		chckbxMS.setBounds(212, 116, 56, 23);
+//		CheckBoxList.add(chckbxMS);
+//		panel_2.add(chckbxMS);
 
-//		chckbxGWO.setFont(new Font("Consolas", Font.PLAIN, 12));
-//		chckbxGWO.setBackground(Color.WHITE);
-//		chckbxGWO.setBounds(212, 116, 56, 23);
-//		CheckBoxList.add(chckbxGWO);
-//		panel_2.add(chckbxGWO);
+		chckbxGWO.setFont(new Font("Consolas", Font.PLAIN, 12));
+		chckbxGWO.setBackground(Color.WHITE);
+		chckbxGWO.setBounds(212, 116, 56, 23);
+		CheckBoxList.add(chckbxGWO);
+		panel_2.add(chckbxGWO);
 		
 		rdbtnTime.setFont(new Font("Consolas", Font.PLAIN, 12));
 		rdbtnTime.setBackground(Color.WHITE);
