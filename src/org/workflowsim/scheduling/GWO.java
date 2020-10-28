@@ -92,17 +92,21 @@ public class GWO {
         }
 
         betaIndex=0;
+        Double temp = Double.MAX_VALUE;
 
         for(int i=0;i<popSize;i++){
-            if(i!=alphaIndex && wolfFitness[i]<wolfFitness[betaIndex]){
+            if(i!=alphaIndex && wolfFitness[i]<temp){
+                temp = wolfFitness[i];
                 betaIndex = i;
             }
         }
 
         deltaIndex=0;
+        temp = Double.MAX_VALUE;
 
         for(int i=0;i<popSize;i++){
-            if(i!=alphaIndex && i!=betaIndex && wolfFitness[i]<wolfFitness[deltaIndex]){
+            if(i!=alphaIndex && i!=betaIndex && wolfFitness[i]<temp){
+                temp = wolfFitness[i];
                 deltaIndex = i;
             }
         }
@@ -117,7 +121,7 @@ public class GWO {
 
         for(int j=0;j<taskNum;j++)
         {
-            //a[j]=2.0-((double)current_iteration*(2.0/(double)maxIter));  GWO
+            //a[j]=2.0-((double)current_iteration*(2.0/(double)maxIter));  //GWO
             a[j] = 2.0*Math.exp((-1*current_iteration)/(maxIter)); //IGWO
             //a[j] = 2.0*(1-((Math.pow(current_iteration,2))/(Math.pow(maxIter,2)))); //mGWO
         }
@@ -170,7 +174,8 @@ public class GWO {
                 X3[i][j]=delta_wolf[j]-A3[j]*(Math.abs(C3[j]*delta_wolf[j]-wolfPositions[i][j]));
                 X3[i][j]=simplebounds(X3[i][j]);
 
-                wolfPositions[i][j]=(int)( w1*X1[i][j] + w2*X2[i][j] + w3*X3[i][j]);
+                //wolfPositions[i][j]=(int)( w1*X1[i][j] + w2*X2[i][j] + w3*X3[i][j]);
+                wolfPositions[i][j]=(int)((X1[i][j] + X2[i][j] + X3[i][j])/3.0);
 
                 //if(wolfPositions[i][j]<0) wolfPositions[i][j] = 0;
                 //if(wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = vmNum-1;
