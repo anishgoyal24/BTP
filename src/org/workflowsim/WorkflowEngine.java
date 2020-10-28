@@ -91,6 +91,11 @@ public class WorkflowEngine extends SimEntity {
 	public static int initGOAIndex = 0;
 	public static int updateGOAIndex = 0;
 
+	//GWO
+	public static double fitnessGWO[] = new double[GWO.popSize];
+	public static int initGWOIndex = 0;
+	public static int updateGWOIndex = 0;
+
 	//MS
 	public static double fitnessMS[] = new double[MSAlgorithm.popSize];
 	public static int initMSIndex = 0;
@@ -230,6 +235,14 @@ public class WorkflowEngine extends SimEntity {
 					case MS:
 						try{
 							processJobReturnForMS(ev);
+						}
+						catch (Exception e){
+							e.printStackTrace();
+						}
+						break;
+					case GWO:
+						try{
+							processJobReturnForGWO(ev);
 						}
 						catch (Exception e){
 							e.printStackTrace();
@@ -496,6 +509,124 @@ public class WorkflowEngine extends SimEntity {
 //      sendNow(getSchedulerId(0), CloudSimTags.END_OF_SIMULATION, null);
 //    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
     }
+
+	protected void processJobReturnForGWO(SimEvent ev) throws Exception {
+		Job job = (Job) ev.getData();
+		if (job.getCloudletStatus() == Cloudlet.FAILED) {
+			// Reclusteringengine will add retry job to jobList
+			System.out.println("failed");
+			int newId = getJobsList().size() + getJobsSubmittedList().size();
+			getJobsList().addAll(ReclusteringEngine.process(job, newId));
+		}
+		getJobsReceivedList().add(job);
+		jobsSubmitted--;
+
+		GWO.current_iteration = iterateNum;
+		//System.out.println(iterateNum + " " + initGWOIndex + " " + updateGWOIndex);
+
+		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
+			//System.out.println("-------------------------------------------");
+			if(initGWOIndex != GWO.popSize) {
+				already = 1;
+				//Processed a particle (the particle obtained by initialization)
+				FogBroker.count++;
+				fitnessGWO[initGWOIndex] = caculatefitness();
+				GWO.wolfFitness[initGWOIndex] = fitnessGWO[initGWOIndex];
+
+				initGWOIndex++;
+				init();
+				if(initGWOIndex == GWO.popSize) {
+					init();
+					updateFlag = 1;
+					updateFlag2 = 1;
+				}
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+			else if(updateGWOIndex != GWO.popSize) {
+				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
+				int gbestIndex = -1;
+				for(int i = 0; i < initGWOIndex; i++) {
+					if(fitnessGWO[i] < GWO.gbest_fitness) {
+						GWO.gbest_fitness = fitnessGWO[i];
+						gbestIndex = i;
+					}
+				}
+				if (gbestIndex > -1) GWO.gbest_schedule = GWO.wolfPositions[gbestIndex];//Update the global optimal scheduling plan
+
+				FogBroker.count2++;
+				fitnessGWO[updateGWOIndex] = caculatefitness();
+
+				//Updation Code
+				GWO.wolfFitness[updateGWOIndex] = fitnessGWO[updateGWOIndex];
+
+				updateGWOIndex++;
+
+				if(FogBroker.count2 != GWO.popSize && GWO.maxIter > iterateNum) {
+					init();
+					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+				}
+			}
+			if(initGWOIndex == GWO.popSize && updateGWOIndex == GWO.popSize) {
+				//System.out.println(iterateNum);
+				//Processed all the particles obtained after initialization and particles obtained after update
+				if(GWO.maxIter > iterateNum) {
+
+					for(int i = 0; i < GWO.popSize; i++) {  //更新全局最优
+						if(fitnessGWO[i] < GWO.gbest_fitness) {
+							//index1=i;
+							GWO.gbest_fitness = fitnessGWO[i];
+							GWO.gbest_schedule = GWO.wolfPositions[i];
+						}
+					}
+					iterateNum++;
+					//System.out.println("After "+iterateNum+" iterations:");
+					//System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
+					//updatebest.add(PsoScheduling.gbest_fitness);
+//	              	printindicators(PsoScheduling.gbest_fitness);
+
+					if(GWO.maxIter != iterateNum) {
+						updateGWOIndex = 0;
+						FogBroker.count2 = 0;
+						getController().updateExecutionTime();
+						init();
+						updateFlag2 = 1;
+						//PsoScheduling.newSchedules.removeAll(PsoScheduling.newSchedules);
+						sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+					}
+				}
+			}
+			if(startlastSchedule == 1) {
+				double f = caculatefitness();
+				System.out.println("The last result : "+f);
+				for (int i = 0; i < getSchedulerIds().size(); i++) {
+					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
+				}
+			}
+			if(GWO.maxIter == iterateNum && startlastSchedule == 0) {
+				//System.out.println("here");
+				for(int i = 0; i < GWO.popSize; i++) {
+					if(fitnessGWO[i] == GWO.gbest_fitness) {
+						GWO.gbest_schedule = GWO.wolfPositions[i];
+					}
+				}
+				//Record the end time of the pso
+				endTime = System.currentTimeMillis();
+				algorithmTime = endTime - getScheduler(0).startTime;
+
+				startlastSchedule = 1;
+				caculatefitness();
+				init();
+				//sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+		}
+		else{
+			updateFlag2 = 0;
+			sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+		}
+//      sendNow(getSchedulerId(0), CloudSimTags.END_OF_SIMULATION, null);
+//    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
+	}
 
 	private void processJobReturnForMS(SimEvent ev) throws Exception{
 		Job job = (Job) ev.getData();
