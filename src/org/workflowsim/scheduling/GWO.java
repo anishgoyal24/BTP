@@ -137,8 +137,7 @@ public class GWO {
 
         for(int i=0;i<popSize;i++)
         {
-            for(int j=0;j<taskNum;j++)
-            {
+
                 //r1=Math.random();
                 //r2=Math.random();
                 r1 = new Random().nextDouble();
@@ -149,9 +148,6 @@ public class GWO {
                 for(int ii=0;ii<taskNum;ii++)
                 {C1[ii]=2.0*r2;}
 
-                X1[i][j]=alpha_wolf[j]-A1[j]*(Math.abs(C1[j]*alpha_wolf[j]-wolfPositions[i][j]));
-                X1[i][j]=simplebounds(X1[i][j]);
-
                 r1 = new Random().nextDouble();
                 r2 = new Random().nextDouble();
 
@@ -159,9 +155,6 @@ public class GWO {
                 {A2[ii]=2.0*a[ii]*r1-a[ii];}
                 for(int ii=0;ii<taskNum;ii++)
                 {C2[ii]=2.0*r2;}
-
-                X2[i][j]=beta_wolf[j]-A2[j]*(Math.abs(C2[j]*beta_wolf[j]-wolfPositions[i][j]));
-                X2[i][j]=simplebounds(X2[i][j]);
 
                 r1 = new Random().nextDouble();
                 r2 = new Random().nextDouble();
@@ -171,17 +164,26 @@ public class GWO {
                 for(int ii=0;ii<taskNum;ii++)
                 {C3[ii]=2.0*r2;}
 
+            for(int j=0;j<taskNum;j++)
+            {
+                X1[i][j]=alpha_wolf[j]-A1[j]*(Math.abs(C1[j]*alpha_wolf[j]-wolfPositions[i][j]));
+                X1[i][j]=simplebounds(X1[i][j]);
+
+                X2[i][j]=beta_wolf[j]-A2[j]*(Math.abs(C2[j]*beta_wolf[j]-wolfPositions[i][j]));
+                X2[i][j]=simplebounds(X2[i][j]);
+
                 X3[i][j]=delta_wolf[j]-A3[j]*(Math.abs(C3[j]*delta_wolf[j]-wolfPositions[i][j]));
                 X3[i][j]=simplebounds(X3[i][j]);
 
-                //wolfPositions[i][j]=(int)( w1*X1[i][j] + w2*X2[i][j] + w3*X3[i][j]);
-                wolfPositions[i][j]=(int)((X1[i][j] + X2[i][j] + X3[i][j])/3.0);
+                wolfPositions[i][j]=(int)( w1*X1[i][j] + w2*X2[i][j] + w3*X3[i][j]);
+                //wolfPositions[i][j]=(int)((X1[i][j] + X2[i][j] + X3[i][j])/3.0);
 
-                //if(wolfPositions[i][j]<0) wolfPositions[i][j] = 0;
-                //if(wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = vmNum-1;
+                if(wolfPositions[i][j]<0) wolfPositions[i][j] = 0;
+                if(wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = vmNum-1;
 
-                if(wolfPositions[i][j]<0 || wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = new Random().nextInt(vmNum);
+                //if(wolfPositions[i][j]<0 || wolfPositions[i][j]>vmNum-1) wolfPositions[i][j] = new Random().nextInt(vmNum);
             }
+
             schedules.set(i,wolfPositions[i]);
         }
 
