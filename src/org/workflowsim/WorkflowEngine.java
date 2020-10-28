@@ -1566,12 +1566,16 @@ public class WorkflowEngine extends SimEntity {
 
         initMSIndex = 0;
         updateMSIndex = 0;
-        
+
+        initGWOIndex = 0;
+        updateGWOIndex = 0;
+
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
         ICSA.clear();
         GOA.clear();
         MSAlgorithm.clear();
+        GWO.clear();
     }
 
 }

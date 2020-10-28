@@ -171,7 +171,7 @@ public class GWO {
     public static void clear() {
         gbest_fitness = Double.MAX_VALUE;
         initFlag = 0;
-        schedules.removeAll(schedules);
+        schedules.clear();
     }
 
 }
