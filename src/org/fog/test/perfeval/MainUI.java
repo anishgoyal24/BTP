@@ -114,7 +114,7 @@ import jxl.write.biff.RowsExceededException;
 
 @SuppressWarnings("serial")
 public class MainUI extends JFrame {
-	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","ICSA", "GOA", "GA", "MS", "GWO"};
+	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","ICSA", "GOA", "GA", "MS", "GWO","MOM"};
 	final static String[] objectiveStr = new String[]{"Time","Energy","Cost"};
 	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht"};
 	final static String[] nodeSizeStr = new String[]{};
@@ -176,6 +176,7 @@ public class MainUI extends JFrame {
 	private final JCheckBox chckbxGOA = new JCheckBox("GOA");
 	private final JCheckBox chckbxMS = new JCheckBox("MS");
 	private final JCheckBox chckbxGWO = new JCheckBox("GWO");
+	private final JCheckBox chckbxMOM = new JCheckBox("MOM");
 	static List<JCheckBox> CheckBoxList = new ArrayList<JCheckBox>();
 	private final JRadioButton rdbtnTime = new JRadioButton("Time",true);
 	private final JRadioButton rdbtnEnergy = new JRadioButton("Energy");
@@ -582,11 +583,11 @@ public class MainUI extends JFrame {
 		CheckBoxList.add(chckbxICSA);
 		panel_2.add(chckbxICSA);
 
-		chckbxGOA.setFont(new Font("Consolas", Font.PLAIN, 12));
-		chckbxGOA.setBackground(Color.WHITE);
-		chckbxGOA.setBounds(212, 116, 56, 23);
-		CheckBoxList.add(chckbxGOA);
-		panel_2.add(chckbxGOA);
+//		chckbxGOA.setFont(new Font("Consolas", Font.PLAIN, 12));
+//		chckbxGOA.setBackground(Color.WHITE);
+//		chckbxGOA.setBounds(212, 116, 56, 23);
+//		CheckBoxList.add(chckbxGOA);
+//		panel_2.add(chckbxGOA);
 
 //		chckbxMS.setFont(new Font("Consolas", Font.PLAIN, 12));
 //		chckbxMS.setBackground(Color.WHITE);
@@ -599,6 +600,13 @@ public class MainUI extends JFrame {
 //		chckbxGWO.setBounds(212, 116, 56, 23);
 //		CheckBoxList.add(chckbxGWO);
 //		panel_2.add(chckbxGWO);
+
+		chckbxMOM.setFont(new Font("Consolas", Font.PLAIN, 12));
+		chckbxMOM.setBackground(Color.WHITE);
+		chckbxMOM.setBounds(212, 116, 56, 23);
+		CheckBoxList.add(chckbxMOM);
+		panel_2.add(chckbxMOM);
+
 		
 		rdbtnTime.setFont(new Font("Consolas", Font.PLAIN, 12));
 		rdbtnTime.setBackground(Color.WHITE);
@@ -967,6 +975,36 @@ public class MainUI extends JFrame {
 							Flag = true;
 							System.out.println("Finished drawing");
 						}
+						else if(scheduler_method.equals("MOM")){
+							int repeat = 30;
+							List<Double[]> repeats = new ArrayList<Double[]>();
+							List<Long> times = new ArrayList<Long>();
+							for(int i = 0; i < repeat; i++){
+								System.out.println("---------------------------For the "+(i+1)+" MOM--------------------------");
+								long time = StartAlgorithm();
+								repeats.add(record.get((record.size()-1)));
+								record.remove(record.size()-1);
+								times.add(time);
+							}
+							Double[] mean = GetMean(repeats);repeats=null;
+							Double[] algomean = new Double[4];
+							algomean[0] = getAlgorithm(scheduler_method);System.out.println(scheduler_method+":");
+							algomean[1] = mean[0];System.out.println("Average task execution time = "+mean[0]);
+							algomean[2] = mean[1];System.out.println("Average energy consumption = "+mean[1]);
+							algomean[3] = mean[2];System.out.println("Average cost = "+mean[2]);
+							record.add(algomean);
+							if(wfEngine.getoffloadingEngine().getOffloadingStrategy() != null)
+								System.out.println("Average offloading Strategy time = " + wfEngine.getAverageOffloadingTime());
+							long averageTime = GetAverageTime(times);times=null;
+							System.out.println("Average "+scheduler_method+" algorithm execution time = " + averageTime);
+							displayTime(averageTime);
+							System.out.println("Drawing "+scheduler_method+" iteration figure......");
+							showDialog("Drawing", "information");
+							Flag = false;
+							drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
+							Flag = true;
+							System.out.println("Finished drawing");
+						}
 		            	else{//其他算法只支持优化时间
 			            	if(!optimize_objective.equalsIgnoreCase("Time"))
 			            		showDialog(scheduler_method+" doesn't support '"+optimize_objective+"' objective , only support 'Time'", "error");
@@ -1278,6 +1316,8 @@ public class MainUI extends JFrame {
 			 return 9.0;
 		 else if(scheduler_method.equals(algrithmStr[9]))
 			 return 10.0;
+		 else if(scheduler_method.equals(algrithmStr[10]))
+			 return 11.0;
 		 return null;
 	}
 	
