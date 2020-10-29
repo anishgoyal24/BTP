@@ -100,6 +100,11 @@ public class WorkflowEngine extends SimEntity {
 	public static double fitnessMS[] = new double[MSAlgorithm.popSize];
 	public static int initMSIndex = 0;
 	public static int updateMSIndex = 0;
+
+	//MomentumSA
+	public static double fitnessMomentumSA[] = new double[MomentumSA.popSize];
+	public static int initMomentumSAIndex = 0;
+	public static int updateMomentumSAIndex = 0;
 	
     /**
      * The job submitted list.
@@ -243,6 +248,14 @@ public class WorkflowEngine extends SimEntity {
 					case GWO:
 						try{
 							processJobReturnForGWO(ev);
+						}
+						catch (Exception e){
+							e.printStackTrace();
+						}
+						break;
+					case MOM:
+						try{
+							processJobReturnForMomentumSA(ev);
 						}
 						catch (Exception e){
 							e.printStackTrace();
@@ -507,6 +520,114 @@ public class WorkflowEngine extends SimEntity {
 //      sendNow(getSchedulerId(0), CloudSimTags.END_OF_SIMULATION, null);
 //    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
     }
+
+	protected void processJobReturnForMomentumSA(SimEvent ev) throws Exception {
+		Job job = (Job) ev.getData();
+		if (job.getCloudletStatus() == Cloudlet.FAILED) {
+			// Reclusteringengine will add retry job to jobList
+			System.out.println("failed");
+			int newId = getJobsList().size() + getJobsSubmittedList().size();
+			getJobsList().addAll(ReclusteringEngine.process(job, newId));
+		}
+		getJobsReceivedList().add(job);
+		jobsSubmitted--;
+
+		MomentumSA.current_iteration = iterateNum;
+
+		if(getJobsList().isEmpty() && jobsSubmitted == 0) {
+			//System.out.println("-------------------------------------------");
+			if(initMomentumSAIndex != MomentumSA.popSize) {
+				already = 1;
+				//Processed a particle (the particle obtained by initialization)
+				FogBroker.count++;
+				fitnessMomentumSA[initMomentumSAIndex++] = caculatefitness();
+				init();
+				if(initMomentumSAIndex == MomentumSA.popSize) {
+					init();
+					updateFlag = 1;
+					updateFlag2 = 1;
+				}
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+			else if(updateMomentumSAIndex != MomentumSA.popSize) {
+				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
+				int gbestIndex = -1;
+				for(int i = 0; i < initMomentumSAIndex; i++) {
+					if(fitnessMomentumSA[i] < MomentumSA.gbest_fitness) {
+						MomentumSA.gbest_fitness = fitnessMomentumSA[i];
+						gbestIndex = i;
+					}
+				}
+				if(gbestIndex > -1) MomentumSA.gbest_schedule = MomentumSA.bodyPositions[gbestIndex];//Update the global optimal scheduling plan
+
+				FogBroker.count2++;
+
+				fitnessMomentumSA[updateMomentumSAIndex++] = caculatefitness();
+
+				if(FogBroker.count2 != MomentumSA.popSize && MomentumSA.maxIter > iterateNum) {
+					init();
+					sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+				}
+			}
+			if(initMomentumSAIndex == MomentumSA.popSize && updateMomentumSAIndex == MomentumSA.popSize) {
+				//Processed all the particles obtained after initialization and particles obtained after update
+				if(MomentumSA.maxIter > iterateNum) {
+
+					for(int i = 0; i < MomentumSA.popSize; i++) {  //更新全局最优
+						if(fitnessMomentumSA[i] < MomentumSA.gbest_fitness) {
+							MomentumSA.gbest_fitness = fitnessMomentumSA[i];
+							MomentumSA.gbest_schedule = MomentumSA.bodyPositions[i];
+						}
+					}
+					iterateNum++;
+
+//					System.out.println("After "+iterateNum+" iterations:");
+//					System.out.println("======gbest_fitness:========"+MomentumSA.gbest_fitness);
+
+					updatebest.add(MomentumSA.gbest_fitness);
+//	              	printindicators(MomentumSA.gbest_fitness);
+
+					if(MomentumSA.maxIter != iterateNum) {
+						updateMomentumSAIndex = 0;
+						FogBroker.count2 = 0;
+						getController().updateExecutionTime();
+						init();
+						updateFlag2 = 1;
+						sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+					}
+				}
+			}
+			if(startlastSchedule == 1) {
+				double f = caculatefitness();
+				System.out.println("The last result : "+f);
+				for (int i = 0; i < getSchedulerIds().size(); i++) {
+					sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
+				}
+			}
+			if(MomentumSA.maxIter == iterateNum && startlastSchedule == 0) {
+				for(int i = 0; i < MomentumSA.popSize; i++) {
+					if(fitnessMomentumSA[i] == MomentumSA.gbest_fitness) {
+						MomentumSA.gbest_schedule = MomentumSA.bodyPositions[i];
+					}
+				}
+				//Record the end time of the pso
+				endTime = System.currentTimeMillis();
+				algorithmTime = endTime - getScheduler(0).startTime;
+
+				startlastSchedule = 1;
+				caculatefitness();
+				init();
+				//sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+				sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+			}
+		}
+		else{
+			updateFlag2 = 0;
+			sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+		}
+//      sendNow(getSchedulerId(0), CloudSimTags.END_OF_SIMULATION, null);
+//    	sendNow(getcontrollerId(), FogEvents.STOP_SIMULATION,null);
+	}
 
 	protected void processJobReturnForGWO(SimEvent ev) throws Exception {
 		Job job = (Job) ev.getData();
@@ -1570,12 +1691,16 @@ public class WorkflowEngine extends SimEntity {
         initGWOIndex = 0;
         updateGWOIndex = 0;
 
+        initMomentumSAIndex = 0;
+        updateMomentumSAIndex = 0;
+
         GASchedulingAlgorithm.clear();
         PsoScheduling.clear();
         ICSA.clear();
         GOA.clear();
         MSAlgorithm.clear();
         GWO.clear();
+        MomentumSA.clear();
     }
 
 }

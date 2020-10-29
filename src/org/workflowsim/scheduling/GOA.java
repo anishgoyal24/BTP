@@ -13,7 +13,7 @@ public class GOA {
 
     public static long time;
     public static int initFlag=0;
-    public static int popSize = 20;
+    public static int popSize = 30;
 
     public static int[][] grassHopperPositions;
     public static double[] grassHopperFitness;
