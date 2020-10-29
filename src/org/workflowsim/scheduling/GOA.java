@@ -13,7 +13,7 @@ public class GOA {
 
     public static long time;
     public static int initFlag=0;
-    public static int popSize = 20;
+    public static int popSize = 30;
 
     public static int[][] grassHopperPositions;
     public static double[] grassHopperFitness;
@@ -29,7 +29,7 @@ public class GOA {
     public static int[] targetPosition;
     public static double targetFitness  = Integer.MAX_VALUE;
     public static final double EPSILON = 1E-14;
-    public static int maxIter = 200;
+    public static int maxIter = 500;
     public static int l = 0; // l is the iteration number
 
     public static double gbest_fitness=Double.MAX_VALUE;
