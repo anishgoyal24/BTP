@@ -11,6 +11,8 @@ public class MSAlgorithm {
     public static int taskNum;
     public static int vmNum;
     public static ArrayList<Moth> schedules = new ArrayList<>();
+    public static int[] bestMoth;
+    public static double bestFitness = Double.MAX_VALUE;
     public static int[] gBestMoth;
     public static double gBestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
@@ -40,6 +42,10 @@ public class MSAlgorithm {
         Collections.sort(schedules, Comparator.comparing(Moth::getFitness));
         gBestMoth = schedules.get(0).getPosition();
         gBestFitness = schedules.get(0).getFitness();
+        if (gBestFitness < bestFitness){
+            bestFitness = gBestFitness;
+            bestMoth = gBestMoth;
+        }
 
         // First Subpopulation
         double alpha = sMax/Math.pow(t, 2);
@@ -78,6 +84,7 @@ public class MSAlgorithm {
         initFlag = 0;
         schedules.clear();
         gBestFitness = Double.MAX_VALUE;
+        bestFitness = Double.MAX_VALUE;
         t = 0;
     }
 

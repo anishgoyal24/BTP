@@ -589,11 +589,11 @@ public class MainUI extends JFrame {
 //		CheckBoxList.add(chckbxGOA);
 //		panel_2.add(chckbxGOA);
 
-//		chckbxMS.setFont(new Font("Consolas", Font.PLAIN, 12));
-//		chckbxMS.setBackground(Color.WHITE);
-//		chckbxMS.setBounds(212, 116, 56, 23);
-//		CheckBoxList.add(chckbxMS);
-//		panel_2.add(chckbxMS);
+		chckbxMS.setFont(new Font("Consolas", Font.PLAIN, 12));
+		chckbxMS.setBackground(Color.WHITE);
+		chckbxMS.setBounds(212, 116, 56, 23);
+		CheckBoxList.add(chckbxMS);
+		panel_2.add(chckbxMS);
 
 //		chckbxGWO.setFont(new Font("Consolas", Font.PLAIN, 12));
 //		chckbxGWO.setBackground(Color.WHITE);
@@ -601,11 +601,11 @@ public class MainUI extends JFrame {
 //		CheckBoxList.add(chckbxGWO);
 //		panel_2.add(chckbxGWO);
 
-		chckbxMOM.setFont(new Font("Consolas", Font.PLAIN, 12));
-		chckbxMOM.setBackground(Color.WHITE);
-		chckbxMOM.setBounds(212, 116, 56, 23);
-		CheckBoxList.add(chckbxMOM);
-		panel_2.add(chckbxMOM);
+//		chckbxMOM.setFont(new Font("Consolas", Font.PLAIN, 12));
+//		chckbxMOM.setBackground(Color.WHITE);
+//		chckbxMOM.setBounds(212, 116, 56, 23);
+//		CheckBoxList.add(chckbxMOM);
+//		panel_2.add(chckbxMOM);
 
 		
 		rdbtnTime.setFont(new Font("Consolas", Font.PLAIN, 12));
