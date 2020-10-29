@@ -27,7 +27,7 @@ public class GOA {
     public static double[][] fitnessHistory;
     public static int[][][] positionHistory;
     public static int[] targetPosition;
-    public static double targetFitness  = Integer.MAX_VALUE;
+    public static double targetFitness  = Double.MAX_VALUE;
     public static final double EPSILON = 1E-14;
     public static int maxIter = 500;
     public static int l = 0; // l is the iteration number
@@ -54,7 +54,7 @@ public class GOA {
         ub = new int[taskNum];
         for(int i = 0; i < lb.length ; i++){
             lb[i] = 0;
-            ub[i] = vmNum;
+            ub[i] = vmNum - 1;
         }
 
         for(int i = 0; i < popSize; i++) {
@@ -74,6 +74,7 @@ public class GOA {
 
     public static void updateGrasshoppers() // l is the iteration number
     {
+        Random random = new Random();
         double c = cMax-(l*((cMax-cMin)/maxIter)); // Eq. (2.8) in the paper
 
         ////////////////////////////////////////////////////////////
@@ -86,12 +87,13 @@ public class GOA {
                     double distance = euclideanDistance(grassHopperPositions[i], grassHopperPositions[j]); //Calculate the distance between two grasshoppers
                     double[] r_ij_vec = new double[taskNum];
                     for(int p=0;p < r_ij_vec.length; p++)
-                        r_ij_vec[p] = (grassHopperPositions[j][p] - grassHopperPositions[i][p])/(distance+EPSILON);// xj-xi/dij in Eq. (2.7)
-                    double xj_xi = 2 + BigDecimal.valueOf(distance).remainder(BigDecimal.valueOf(2)).doubleValue();// |xjd - xid| in Eq. (2.7)
+                        r_ij_vec[p] = (grassHopperPositions[j][p] - grassHopperPositions[i][p])/(distance);// xj-xi/dij in Eq. (2.7)
+                    //double xj_xi = 2 + BigDecimal.valueOf(distance).remainder(BigDecimal.valueOf(2)).doubleValue();// |xjd - xid| in Eq. (2.7)
 
                     double[] s_ij = new double[taskNum];
                     for(int p=0;p < r_ij_vec.length; p++)
-                        s_ij[p]=((ub[p] - lb[p])*c/2)*S_func(xj_xi)*r_ij_vec[p];// The first part inside the big bracket in Eq. (2.7)
+                        //s_ij[p]=((ub[p] - lb[p])*c/2)*S_func(xj_xi)*r_ij_vec[p];// The first part inside the big bracket in Eq. (2.7)
+                        s_ij[p]=((ub[p] - lb[p])*c/2)*S_func(grassHopperPositions[j][p] - grassHopperPositions[i][p])*r_ij_vec[p];
 
                     for(int p=0;p < S_i.length; p++)
                         S_i[p]=S_i[p]+s_ij[p];
@@ -113,8 +115,7 @@ public class GOA {
             // Relocate grasshoppers that go outside the search space
 
             for(int j = 0; j < grassHopperPositions[i].length ; j++){
-                if(grassHopperPositions[i][j] > ub[j])grassHopperPositions[i][j]=ub[j];
-                if(grassHopperPositions[i][j] < lb[j])grassHopperPositions[i][j]=lb[j];
+                if (grassHopperPositions[i][j] < 0 || grassHopperPositions[i][j] >= vmNum) grassHopperPositions[i][j] = random.nextInt(vmNum);
             }
             schedules.set(i,grassHopperPositions[i]);
 
@@ -137,7 +138,8 @@ public class GOA {
 
     public static void clear() {
         gbest_fitness = Double.MAX_VALUE;
+        targetFitness = Double.MAX_VALUE;
         initFlag = 0;
-        schedules.removeAll(schedules);
+        schedules.clear();
     }
 }

@@ -892,14 +892,14 @@ public class WorkflowEngine extends SimEntity {
 			}
 			else if(updateGOAIndex != GOA.popSize) {
 				//Processed all the particles obtained by initialization, and processed one particle (particles obtained after update)
-				int gbestIndex = -1;
-				for(int i = 0; i < initGOAIndex; i++) {
-					if(fitnessGOA[i] < GOA.gbest_fitness) {
-						GOA.gbest_fitness = fitnessGOA[i];
-						gbestIndex = i;
-					}
-				}
-				if (gbestIndex > -1) GOA.gbest_schedule = GOA.grassHopperPositions[gbestIndex];//Update the global optimal scheduling plan
+//				int gbestIndex = -1;
+//				for(int i = 0; i < initGOAIndex; i++) {
+//					if(fitnessGOA[i] < GOA.gbest_fitness) {
+//						GOA.gbest_fitness = fitnessGOA[i];
+//						gbestIndex = i;
+//					}
+//				}
+//				if (gbestIndex > -1) GOA.gbest_schedule = GOA.grassHopperPositions[gbestIndex];//Update the global optimal scheduling plan
 
 				FogBroker.count2++;
 				fitnessGOA[updateGOAIndex] = caculatefitness();
@@ -929,20 +929,21 @@ public class WorkflowEngine extends SimEntity {
 						}
 					}
 
-					for(int i = 0; i < GOA.popSize; i++) {  //更新全局最优
-						if(fitnessGOA[i] < GOA.gbest_fitness) {
-							//index1=i;
-							GOA.gbest_fitness = fitnessGOA[i];
-							GOA.gbest_schedule = GOA.grassHopperPositions[i];
-						}
-					}
+//					for(int i = 0; i < GOA.popSize; i++) {  //更新全局最优
+//						if(fitnessGOA[i] < GOA.gbest_fitness) {
+//							//index1=i;
+//							GOA.gbest_fitness = fitnessGOA[i];
+//							GOA.gbest_schedule = GOA.grassHopperPositions[i];
+//						}
+//					}
 					iterateNum++;
 					//System.out.println("After "+iterateNum+" iterations:");
 					//System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
-					updatebest.add(GOA.gbest_fitness);
+					updatebest.add(GOA.targetFitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
 
 					if(GOA.maxIter != iterateNum) {
+						System.out.println(GOA.targetFitness);
 						updateGOAIndex = 0;
 						FogBroker.count2 = 0;
 						getController().updateExecutionTime();
@@ -963,11 +964,11 @@ public class WorkflowEngine extends SimEntity {
 			}
 			if(GOA.maxIter == iterateNum && startlastSchedule == 0) {
 				//System.out.println("here");
-				for(int i = 0; i < GOA.popSize; i++) {
-					if(fitnessGOA[i] == GOA.gbest_fitness) {
-						GOA.gbest_schedule = GOA.grassHopperPositions[i];
-					}
-				}
+//				for(int i = 0; i < GOA.popSize; i++) {
+//					if(fitnessGOA[i] == GOA.gbest_fitness) {
+//						GOA.gbest_schedule = GOA.grassHopperPositions[i];
+//					}
+//				}
 				//Record the end time of the pso
 				endTime = System.currentTimeMillis();
 				algorithmTime = endTime - getScheduler(0).startTime;

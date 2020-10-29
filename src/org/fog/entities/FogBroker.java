@@ -706,7 +706,7 @@ public class FogBroker extends PowerDatacenterBroker{
         List<Cloudlet> scheduledList =new ArrayList<Cloudlet>();
         for(int i=0;i<cloudletList.size();i++) {
             int cloudletId=cloudletList.get(i).getCloudletId();
-            int vmId=GOA.gbest_schedule[cloudletId];
+            int vmId=GOA.targetPosition[cloudletId];
             cloudletList.get(i).setVmId(vmId);
             //setVmState(vmId);
             scheduledList.add(cloudletList.get(i));
