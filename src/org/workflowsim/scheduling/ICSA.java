@@ -11,8 +11,8 @@ public class ICSA {
     public static int[] bestSchedule;
     public static double bestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
-    public static int popSize = 25;
-    public static int iterations = 200;
+    public static int popSize = 30;
+    public static int iterations = 300;
     public static int flightLength = 1;
     public static double worstFitness = Double.MIN_VALUE;
     public static double beta = 1.5;

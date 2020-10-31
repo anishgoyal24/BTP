@@ -27,7 +27,7 @@ public class MomentumSA {
     public static double r2;
     public static int sign;
 
-    public static int maxIter = 500;
+    public static int maxIter = 200;
     public static int current_iteration = 0;
 
     public static double gbest_fitness=Double.MAX_VALUE;
