@@ -39,7 +39,8 @@ public class GASchedulingAlgorithm {
 	public  static void initPopsRandomly(int taskNum1,int vmNum1)
 	{
 		taskNum=taskNum1;
-		vmNum=vmNum1;
+//		vmNum=vmNum1;
+		vmNum = 6;
 		gbestSchedule=new int[taskNum];
 		bestParent=new int[taskNum];
 		

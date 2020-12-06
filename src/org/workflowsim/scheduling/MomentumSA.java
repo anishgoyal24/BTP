@@ -27,7 +27,7 @@ public class MomentumSA {
     public static double r2;
     public static int sign;
 
-    public static int maxIter = 200;
+    public static int maxIter = 500;
     public static int current_iteration = 0;
 
     public static double gbest_fitness=Double.MAX_VALUE;
@@ -38,7 +38,8 @@ public class MomentumSA {
         //System.out.println("gwo-init-"+current_iteration);
 
         taskNum = jobNum;
-        vmNum = maxVmNum;
+//        vmNum = maxVmNum;
+        vmNum = 6;
 
         bodyPositions = new int[popSize][taskNum];
         bodyFitness = new double[popSize];

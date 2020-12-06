@@ -12,14 +12,15 @@ public class ICSA {
     public static double bestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
     public static int popSize = 30;
-    public static int iterations = 200;
+    public static int iterations = 500;
     public static int flightLength = 1;
     public static double worstFitness = Double.MIN_VALUE;
     public static double beta = 1.5;
 
     public static void initPopsRandomly(int taskNum1,int vmNum1){
         taskNum = taskNum1;
-        vmNum = vmNum1;
+//        vmNum = vmNum1;
+        vmNum = 6;
 
         for(int i = 0; i < popSize; i++){
             Crow schedule = new Crow(taskNum, vmNum);

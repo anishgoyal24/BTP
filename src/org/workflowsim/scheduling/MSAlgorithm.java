@@ -17,7 +17,7 @@ public class MSAlgorithm {
     public static double gBestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
     public static int popSize = 30;
-    public static int iterations = 200;
+    public static int iterations = 500;
     public static double beta = 1.5;
     public static double sMax = 1.0;
     public static double accFactor = 0.618;
@@ -26,7 +26,8 @@ public class MSAlgorithm {
 
     public static void initPopsRandomly(int taskNum1,int vmNum1){
         taskNum = taskNum1;
-        vmNum = vmNum1;
+//        vmNum = vmNum1;
+        vmNum = 6;
 
         for(int i = 0; i < popSize; i++){
             Moth schedule = new Moth(taskNum, vmNum);

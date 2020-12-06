@@ -35,7 +35,8 @@ public class PsoScheduling {
 	public static void init(int jobNum,int maxVmNum) {
 		pbest_fitness=new double[particleNum];
 		  taskNum=jobNum;
-		  vmNum=maxVmNum;
+//		  vmNum=maxVmNum;
+		vmNum = 6;
 		  gbest_schedule=new int[taskNum];
 			for(int i=0;i<particleNum;i++)
 			{
