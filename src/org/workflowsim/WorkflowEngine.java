@@ -473,8 +473,8 @@ public class WorkflowEngine extends SimEntity {
             			}
             		}
             		iterateNum++;
-            		System.out.println("After "+iterateNum+" iterations:");
-            		System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
+//            		System.out.println("After "+iterateNum+" iterations:");
+//            		System.out.println("======gbest_fitness:========"+PsoScheduling.gbest_fitness);
             		updatebest.add(PsoScheduling.gbest_fitness);
 //	              	printindicators(PsoScheduling.gbest_fitness);
             		

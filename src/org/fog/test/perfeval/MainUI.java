@@ -119,8 +119,8 @@ public class MainUI extends JFrame {
 	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht"};
 	final static String[] nodeSizeStr = new String[]{};
 	final static String[] cloudNumStr = new String[]{null,"1","2","3","4","5"};
-	final static String[] edgeNumStr = new String[]{null,"1","2","3","4","5"};
-	final static String[] mobileNumStr = new String[]{null,"1","2","3","4","5"};
+	final static String[] edgeNumStr = new String[]{null,"1","2","3","4","5", "6", "7", "8", "9", "10"};
+	final static String[] mobileNumStr = new String[]{null,"1","2","3","4","5", "6", "7", "8", "9", "10"};
 	final static String[] strategyStr = new String[]{null,"All-in-Fog","All-in-Cloud","Simple"};
 	final static String[] columnNames = {"Job ID", "Task ID", "STATUS", "Data center ID", "VM ID", 
 			"Time","Start Time","Finish Time","Depth","Cost","Parents"};//表头元素

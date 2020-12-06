@@ -22,7 +22,7 @@ public class MomentumSA {
     public static int worstIndex;
     public static double externalMass;
     public static double[] externalVelocity;
-    public static double vMax = 2.0; // FInd Best value of this
+    public static double vMax = 20.0; // FInd Best value of this
     public static double r1;
     public static double r2;
     public static int sign;
