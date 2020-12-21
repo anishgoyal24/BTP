@@ -17,7 +17,7 @@ public class MSAlgorithm {
     public static double gBestFitness = Double.MAX_VALUE;
     public static int initFlag = 0;
     public static int popSize = 30;
-    public static int iterations = 500;
+    public static int iterations = 300;
     public static double beta = 1.5;
     public static double sMax = 1.0;
     public static double accFactor = 0.618;

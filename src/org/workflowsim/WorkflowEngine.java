@@ -1132,7 +1132,8 @@ public class WorkflowEngine extends SimEntity {
     	//System.out.println("\t"+time+"\t"+energy+"\t"+cost);
     	switch (Parameters.getOptimization()) {
 		case Time:
-			return time;
+			//return time*0.2 + cost*0.2 + time*0.6;
+			return (time - 279)/(475 - 279) + (energy - 9)/6 + (cost - 134)/(456 - 143);
 		case Energy:
 			return energy;
 		case Cost:
